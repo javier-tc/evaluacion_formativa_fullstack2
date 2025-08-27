@@ -7,7 +7,7 @@
 
 :root {
     --primary-color: #1a1a1a;
-    --secondary-color: #e74c3c;
+    --secondary-color: #e64533;
     --accent-color: #f39c12;
     --text-color: #333;
     --light-text: #666;
@@ -162,8 +162,8 @@ body {
 }
 
 .producto-card img {
-    width: 300px;
-    height: 300px;
+    width: 400px;
+    height: 400px;
     object-fit: contain;
 }
 
