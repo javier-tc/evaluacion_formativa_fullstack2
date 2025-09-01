@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos - VinylStore</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <h1><a href="index.html" class="nav-brand-link">VinylStore</a></h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Inicio</a></li>
+                <li><a href="productos.html" class="nav-link nav-btn active">Productos</a></li>
+                <li><a href="#contacto" class="nav-link">Contacto</a></li>
+                <li><a href="login.html" class="nav-link">Ingresar</a></li>
+                <li><a href="registro.html" class="nav-link nav-btn">Registrarse</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero productos-hero">
+            <div class="hero-content">
+                <h2>Nuestra Colección de Vinilos</h2>
+                <p>Descubre miles de títulos únicos y ediciones especiales</p>
+            </div>
+        </section>
+
+        <section class="productos-seccion">
+            <div class="productos-container">
+                <div class="productos-filtros">
+                    <h3>Filtrar por:</h3>
+                    <div class="filtros-opciones">
+                        <button class="filtro-btn active" data-categoria="todos">Todos</button>
+                        <button class="filtro-btn" data-categoria="rock">Rock</button>
+                        <button class="filtro-btn" data-categoria="jazz">Jazz</button>
+                        <button class="filtro-btn" data-categoria="pop">Pop</button>
+                        <button class="filtro-btn" data-categoria="clasica">Clásica</button>
+                    </div>
+                </div>
+
+                <div class="productos-grid" id="productos-grid">
+                    <!--producto 1-->
+                    <article class="producto-card" data-categoria="rock">
+                        <div class="producto-imagen">
+                            <img src="https://www.musicworld.cl/img/cms/cd%20vinilos/led%20zeppelin/d2IV.jpg" alt="Led Zeppelin IV">
+                            <div class="producto-overlay">
+                                <button class="ver-detalle-btn" onclick="verDetalle(1)">Ver Detalle</button>
+                            </div>
+                        </div>
+                        <div class="producto-info">
+                            <h3>Led Zeppelin IV</h3>
+                            <p class="artista">Led Zeppelin</p>
+                            <p class="genero">Rock • 1971</p>
+                            <span class="precio">$25.000</span>
+                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
+                        </div>
+                    </article>
+
+                    <!--producto 2-->
+                    <article class="producto-card" data-categoria="pop">
+                        <div class="producto-imagen">
+                            <img src="https://thesoundofvinyl.us/cdn/shop/products/Amy-Winehouse-Backl-To-Black-1LP-Vinyl.png?v=1661868011&width=1000" alt="Back To Black">
+                            <div class="producto-overlay">
+                                <button class="ver-detalle-btn" onclick="verDetalle(2)">Ver Detalle</button>
+                            </div>
+                        </div>
+                        <div class="producto-info">
+                            <h3>Back To Black</h3>
+                            <p class="artista">Amy Winehouse</p>
+                            <p class="genero">Pop • 2006</p>
+                            <span class="precio">$30.000</span>
+                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
+                        </div>
+                    </article>
+
+                    <!--producto 3-->
+                    <article class="producto-card" data-categoria="pop">
+                        <div class="producto-imagen">
+                            <img src="https://cdn.webshopapp.com/shops/13847/files/405053016/gorillaz-plastic-beach-vinyl-2lp.jpg" alt="Plastic Beach">
+                            <div class="producto-overlay">
+                                <button class="ver-detalle-btn" onclick="verDetalle(3)">Ver Detalle</button>
+                            </div>
+                        </div>
+                        <div class="producto-info">
+                            <h3>Plastic Beach</h3>
+                            <p class="artista">Gorillaz</p>
+                            <p class="genero">Pop • 2010</p>
+                            <span class="precio">$28.000</span>
+                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
+                        </div>
+                    </article>
+
+                    <!--producto 4-->
+                    <article class="producto-card" data-categoria="jazz">
+                        <div class="producto-imagen">
+                            <img src="https://cdn.shopify.com/s/files/1/0264/4075/2726/products/kind-of-blue-miles-davis-vinyl-record.jpg" alt="Kind of Blue">
+                            <div class="producto-overlay">
+                                <button class="ver-detalle-btn" onclick="verDetalle(4)">Ver Detalle</button>
+                            </div>
+                        </div>
+                        <div class="producto-info">
+                            <h3>Kind of Blue</h3>
+                            <p class="artista">Miles Davis</p>
+                            <p class="genero">Jazz • 1959</p>
+                            <span class="precio">$35.000</span>
+                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
+                        </div>
+                    </article>
+
+                    <!--producto 5-->
+                    <article class="producto-card" data-categoria="rock">
+                        <div class="producto-imagen">
+                            <img src="https://cdn.shopify.com/s/files/1/0264/4075/2726/products/dark-side-of-the-moon-pink-floyd-vinyl-record.jpg" alt="The Dark Side of the Moon">
+                            <div class="producto-overlay">
+                                <button class="ver-detalle-btn" onclick="verDetalle(5)">Ver Detalle</button>
+                            </div>
+                        </div>
+                        <div class="producto-info">
+                            <h3>The Dark Side of the Moon</h3>
+                            <p class="artista">Pink Floyd</p>
+                            <p class="genero">Rock • 1973</p>
+                            <span class="precio">$32.000</span>
+                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
+                        </div>
+                    </article>
+
+                    <!--producto 6-->
+                    <article class="producto-card" data-categoria="clasica">
+                        <div class="producto-imagen">
+                            <img src="https://cdn.shopify.com/s/files/1/0264/4075/2726/products/beethoven-symphony-no-9-vinyl-record.jpg" alt="Symphony No. 9">
+                            <div class="producto-overlay">
+                                <button class="ver-detalle-btn" onclick="verDetalle(6)">Ver Detalle</button>
+                            </div>
+                        </div>
+                        <div class="producto-info">
+                            <h3>Symphony No. 9</h3>
+                            <p class="artista">Beethoven</p>
+                            <p class="genero">Clásica • 1824</p>
+                            <span class="precio">$40.000</span>
+                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="contacto" class="contacto">
+            <h2>Contacto</h2>
+            <div class="contacto-info">
+                <p>¿Tienes preguntas sobre nuestros productos?</p>
+                <p>Email: info@vinylstore.cl</p>
+                <p>Teléfono: +56 9 1234 5678</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 VinylStore. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        //func para ver detalle del producto
+        function verDetalle(productoId) {
+            window.location.href = `detalle-producto.html?id=${productoId}`;
+        }
+    </script>
+</body>
+</html>
