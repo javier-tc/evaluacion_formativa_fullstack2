@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             input.addEventListener('input', function() {
-                if (this.classList.contains('error')) {
+                if (this.parentElement.classList.contains('error')) {
                     validateField(this);
                 }
             });
@@ -107,14 +107,25 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Ingresando...';
             
+            //verificar si es administrador
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
             setTimeout(() => {
-                alert('¡Bienvenido de vuelta a VinylStore!');
-                form.reset();
-                inputs.forEach(input => {
-                    if (input.type !== 'checkbox') {
-                        input.parentElement.classList.remove('success', 'error');
-                    }
-                });
+                //credenciales de administrador (en producción esto vendría del backend)
+                if (email === 'admin@vinylstore.cl' && password === 'admin123') {
+                    //redirigir al panel de administrador
+                    window.location.href = 'admin.html';
+                } else {
+                    //login normal de usuario
+                    alert('¡Bienvenido de vuelta a VinylStore!');
+                    form.reset();
+                    inputs.forEach(input => {
+                        if (input.type !== 'checkbox') {
+                            input.parentElement.classList.remove('success', 'error');
+                        }
+                    });
+                }
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Ingresar';
             }, 1500);

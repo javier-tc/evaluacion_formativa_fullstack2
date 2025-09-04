@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Usuario - VinylStore</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <!--sidebar-->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-circle-notch"></i>
+                    <span>VinylStore</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="admin.html" class="nav-link">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a href="admin-orders.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Pedidos</span>
+                        </a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a href="admin-inventory.html" class="nav-link">
+                            <i class="fas fa-warehouse"></i>
+                            <span>Inventario</span>
+                        </a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a href="admin-reports.html" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li> -->
+                    <li class="nav-item active">
+                        <a href="admin-users.html" class="nav-link">
+                            <i class="fas fa-user"></i>
+                            <span>Usuarios</span>
+                        </a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a href="admin-customers.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                        </a>
+                    </li> -->
+                </ul>
+            </nav>
+            
+            <!-- <div class="sidebar-utilities">
+                <ul class="utilities-list">
+                    <li class="nav-item">
+                        <a href="admin-settings.html" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin-profile.html" class="nav-link">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Perfil</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-search"></i>
+                            <span>Buscar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Ayuda</span>
+                        </a>
+                    </li>
+                </ul>
+            </div> -->
+            
+            <div class="sidebar-profile">
+                <div class="profile-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Administrador</span>
+                </div>
+            </div>
+        </aside>
+
+        <!--contenido principal-->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="header-content">
+                    <h1>Nuevo Usuario</h1>
+                    <div class="header-actions">
+                        <button class="btn-secondary" onclick="window.location.href='admin-users.html'">
+                            <i class="fas fa-arrow-left"></i>
+                            Volver
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <div class="content-section">
+                    <div class="form-container-admin">
+                        <form id="newUserForm" class="admin-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="firstName">Nombre *</label>
+                                    <input type="text" id="firstName" name="firstName" required>
+                                    <span class="error-message" id="firstName-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="lastName">Apellido *</label>
+                                    <input type="text" id="lastName" name="lastName" required>
+                                    <span class="error-message" id="lastName-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">Email *</label>
+                                    <input type="email" id="email" name="email" required>
+                                    <span class="error-message" id="email-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="username">Nombre de Usuario *</label>
+                                    <input type="text" id="username" name="username" required>
+                                    <span class="error-message" id="username-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="password">Contraseña *</label>
+                                    <input type="password" id="password" name="password" required>
+                                    <span class="error-message" id="password-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="confirmPassword">Confirmar Contraseña *</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                                    <span class="error-message" id="confirmPassword-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="role">Rol *</label>
+                                    <select id="role" name="role" required>
+                                        <option value="">Seleccionar rol</option>
+                                        <option value="user">Usuario</option>
+                                        <option value="moderator">Moderador</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                    <span class="error-message" id="role-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="status">Estado *</label>
+                                    <select id="status" name="status" required>
+                                        <option value="">Seleccionar estado</option>
+                                        <option value="active">Activo</option>
+                                        <option value="inactive">Inactivo</option>
+                                    </select>
+                                    <span class="error-message" id="status-error"></span>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label for="phone">Teléfono</label>
+                                    <input type="tel" id="phone" name="phone">
+                                    <span class="error-message" id="phone-error"></span>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label for="address">Dirección</label>
+                                    <textarea id="address" name="address" rows="3"></textarea>
+                                    <span class="error-message" id="address-error"></span>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label for="notes">Notas</label>
+                                    <textarea id="notes" name="notes" rows="3" placeholder="Información adicional sobre el usuario..."></textarea>
+                                    <span class="error-message" id="notes-error"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="window.location.href='admin-users.html'">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Crear Usuario
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin-new-user.js"></script>
+</body>
+</html>

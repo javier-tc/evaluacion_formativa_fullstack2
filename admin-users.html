@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - VinylStore</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <!--sidebar-->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-circle-notch"></i>
+                    <span>VinylStore</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="admin.html" class="nav-link">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a href="admin-orders.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Pedidos</span>
+                        </a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a href="admin-inventory.html" class="nav-link">
+                            <i class="fas fa-warehouse"></i>
+                            <span>Inventario</span>
+                        </a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a href="admin-reports.html" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li> -->
+                    <li class="nav-item active">
+                        <a href="admin-users.html" class="nav-link">
+                            <i class="fas fa-user"></i>
+                            <span>Usuarios</span>
+                        </a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a href="admin-customers.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                        </a>
+                    </li> -->
+                </ul>
+            </nav>
+<!--             
+            <div class="sidebar-utilities">
+                <ul class="utilities-list">
+                    <li class="nav-item">
+                        <a href="admin-settings.html" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin-profile.html" class="nav-link">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Perfil</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-search"></i>
+                            <span>Buscar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Ayuda</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+             -->
+            <div class="sidebar-profile">
+                <div class="profile-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Administrador</span>
+                </div>
+            </div>
+        </aside>
+
+        <!--contenido principal-->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="header-content">
+                    <h1>Gestión de Usuarios</h1>
+                    <div class="header-actions">
+                        <button class="btn-primary" onclick="window.location.href='admin-new-user.html'">
+                            <i class="fas fa-plus"></i>
+                            Nuevo Usuario
+                        </button>
+                        <!-- <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                        </button> -->
+                    </div>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>Listado de Usuarios</h2>
+                        <div class="search-filter">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Buscar usuarios..." id="searchUsers">
+                            </div>
+                            <select id="filterRole">
+                                <option value="">Todos los roles</option>
+                                <option value="admin">Administrador</option>
+                                <option value="user">Usuario</option>
+                                <option value="moderator">Moderador</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="users-table-container">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Registro</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td>1</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <p class="user-name">María González</p>
+                                                <p class="user-username">@mariagonzalez</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>maria.gonzalez@email.com</td>
+                                    <td><span class="role-badge user">Usuario</span></td>
+                                    <td><span class="status-badge active">Activo</span></td>
+                                    <td>15/01/2025</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-edit" onclick="editUser(1)" title="Editar Usuario">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-delete" onclick="deleteUser(1)" title="Eliminar Usuario">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <p class="user-name">Carlos Ruiz</p>
+                                                <p class="user-username">@carlosruiz</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>carlos.ruiz@email.com</td>
+                                    <td><span class="role-badge admin">Administrador</span></td>
+                                    <td><span class="status-badge active">Activo</span></td>
+                                    <td>10/01/2025</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-edit" onclick="editUser(2)" title="Editar Usuario">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-delete" onclick="deleteUser(2)" title="Eliminar Usuario">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <p class="user-name">Ana Silva</p>
+                                                <p class="user-username">@anasilva</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>ana.silva@email.com</td>
+                                    <td><span class="role-badge moderator">Moderador</span></td>
+                                    <td><span class="status-badge inactive">Inactivo</span></td>
+                                    <td>05/01/2025</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-edit" onclick="editUser(3)" title="Editar Usuario">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-delete" onclick="deleteUser(3)" title="Eliminar Usuario">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <p class="user-name">Luis Mendoza</p>
+                                                <p class="user-username">@luismendoza</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>luis.mendoza@email.com</td>
+                                    <td><span class="role-badge user">Usuario</span></td>
+                                    <td><span class="status-badge active">Activo</span></td>
+                                    <td>20/01/2025</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-edit" onclick="editUser(4)" title="Editar Usuario">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-delete" onclick="deleteUser(4)" title="Eliminar Usuario">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <p class="user-name">Patricia López</p>
+                                                <p class="user-username">@patricialopez</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>patricia.lopez@email.com</td>
+                                    <td><span class="role-badge user">Usuario</span></td>
+                                    <td><span class="status-badge active">Activo</span></td>
+                                    <td>18/01/2025</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-edit" onclick="editUser(5)" title="Editar Usuario">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-delete" onclick="deleteUser(5)" title="Eliminar Usuario">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <button class="pagination-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="pagination-info">Página 1 de 1</span>
+                        <button class="pagination-btn" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin-users.js"></script>
+</body>
+</html>
