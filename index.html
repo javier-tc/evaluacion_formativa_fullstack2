@@ -18,6 +18,12 @@
                 <li><a href="blogs.html" class="nav-link">Blogs</a></li>
                 <li><a href="login.html" class="nav-link">Ingresar</a></li>
                 <li><a href="registro.html" class="nav-link nav-btn">Registrarse</a></li>
+                <li>
+                    <div class="cart-icon" onclick="cart.toggleCart()">
+                        🛒
+                        <span class="cart-count" id="cart-count"></span>
+                    </div>
+                </li>
             </ul>
         </nav>
     </header>
@@ -41,6 +47,7 @@
                     <h3>Led Zeppelin</h3>
                     <p>Led Zeppelin IV</p>
                     <span class="precio">$25.000</span>
+                    <button class="agregar-carrito-btn" onclick="cart.addToCart(1, 'Led Zeppelin IV', 25000, 'https://www.musicworld.cl/img/cms/cd%20vinilos/led%20zeppelin/d2IV.jpg', 'Led Zeppelin')">Agregar al Carrito</button>
                 </article>
                 <article class="producto-card">
                     <img src="https://thesoundofvinyl.us/cdn/shop/products/Amy-Winehouse-Backl-To-Black-1LP-Vinyl.png?v=1661868011&width=1000" alt="Vinilo Amy Winehouse">
@@ -48,6 +55,7 @@
                     <h3>Amy Winehouse</h3>
                     <p>Back To Black</p>
                     <span class="precio">$30.000</span>
+                    <button class="agregar-carrito-btn" onclick="cart.addToCart(2, 'Back To Black', 30000, 'https://thesoundofvinyl.us/cdn/shop/products/Amy-Winehouse-Backl-To-Black-1LP-Vinyl.png?v=1661868011&width=1000', 'Amy Winehouse')">Agregar al Carrito</button>
                 </article>
                 <article class="producto-card">
                     <img src="https://cdn.webshopapp.com/shops/13847/files/405053016/gorillaz-plastic-beach-vinyl-2lp.jpg" alt="Vinilo Gorillaz">
@@ -55,6 +63,7 @@
                     <h3>Gorillaz</h3>
                     <p>Plastic Beach</p>
                     <span class="precio">$28.000</span>
+                    <button class="agregar-carrito-btn" onclick="cart.addToCart(3, 'Plastic Beach', 28000, 'https://cdn.webshopapp.com/shops/13847/files/405053016/gorillaz-plastic-beach-vinyl-2lp.jpg', 'Gorillaz')">Agregar al Carrito</button>
                 </article>
             </div>
         </section>
@@ -74,6 +83,31 @@
   </div>
 </footer>
 
+<!--modal del carrito-->
+<div id="cart-modal" class="cart-modal">
+    <div class="cart-content">
+        <div class="cart-header">
+            <h2>Mi Carrito</h2>
+            <button class="close-cart" onclick="cart.closeCart()">&times;</button>
+        </div>
+        <div class="cart-body">
+            <div id="cart-empty" class="cart-empty">
+                <p>Tu carrito está vacío</p>
+                <p>¡Agrega algunos vinilos!</p>
+            </div>
+            <div id="cart-items"></div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                Total: <span id="cart-total">$0</span>
+            </div>
+            <button class="checkout-btn" onclick="alert('¡Gracias por tu compra!')" disabled>
+                Proceder al Pago
+            </button>
+        </div>
+    </div>
+</div>
 
+<script src="cart.js"></script>
 </body>
 </html>

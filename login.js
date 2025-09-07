@@ -28,9 +28,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (email.trim() === '') {
             return 'El email es obligatorio';
         }
+        if (email.length > 100) {
+            return 'El email no puede exceder 100 caracteres';
+        }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return 'Ingresa un email válido';
+        }
+        //validar dominios permitidos
+        const allowedDomains = ['@duoc.cl', '@profesor.duoc.cl', '@gmail.com'];
+        const hasValidDomain = allowedDomains.some(domain => email.endsWith(domain));
+        if (!hasValidDomain) {
+            return 'Solo se permiten correos de @duoc.cl, @profesor.duoc.cl y @gmail.com';
         }
         return '';
     }
@@ -40,8 +49,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (password === '') {
             return 'La contraseña es obligatoria';
         }
-        if (password.length < 6) {
-            return 'La contraseña debe tener al menos 6 caracteres';
+        if (password.length < 4) {
+            return 'La contraseña debe tener al menos 4 caracteres';
+        }
+        if (password.length > 10) {
+            return 'La contraseña no puede exceder 10 caracteres';
         }
         return '';
     }
@@ -113,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             setTimeout(() => {
                 //credenciales de administrador (en producción esto vendría del backend)
-                if (email === 'admin@vinylstore.cl' && password === 'admin123') {
+                if (email === 'admin@gmail.com' && password === 'admin123') {
                     //redirigir al panel de administrador
                     window.location.href = 'admin.html';
                 } else {

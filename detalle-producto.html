@@ -18,6 +18,12 @@
                 <li><a href="blogs.html" class="nav-link">Blogs</a></li>
                 <li><a href="login.html" class="nav-link">Ingresar</a></li>
                 <li><a href="registro.html" class="nav-link nav-btn">Registrarse</a></li>
+                <li>
+                    <div class="cart-icon" onclick="cart.toggleCart()">
+                        🛒
+                        <span class="cart-count" id="cart-count"></span>
+                    </div>
+                </li>
             </ul>
         </nav>
     </header>
@@ -34,61 +40,40 @@
         <section class="productos-relacionados">
             <div class="productos-container">
                 <h2>Productos Relacionados</h2>
-                <div class="productos-grid">
-                    <article class="producto-card">
-                        <div class="producto-imagen">
-                            <img src="https://cdn.shopify.com/s/files/1/0264/4075/2726/products/abbey-road-beatles-vinyl-record.jpg" alt="Abbey Road">
-                            <div class="producto-overlay">
-                                <button class="ver-detalle-btn" onclick="verDetalle(7)">Ver Detalle</button>
-                            </div>
-                        </div>
-                        <div class="producto-info">
-                            <h3>Abbey Road</h3>
-                            <p class="artista">The Beatles</p>
-                            <p class="genero">Rock - 1969</p>
-                            <span class="precio">$38.000</span>
-                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
-                        </div>
-                    </article>
-
-                    <article class="producto-card">
-                        <div class="producto-imagen">
-                            <img src="https://cdn.shopify.com/s/files/1/0264/4075/2726/products/thriller-michael-jackson-vinyl-record.jpg" alt="Thriller">
-                            <div class="producto-overlay">
-                                <button class="ver-detalle-btn" onclick="verDetalle(8)">Ver Detalle</button>
-                            </div>
-                        </div>
-                        <div class="producto-info">
-                            <h3>Thriller</h3>
-                            <p class="artista">Michael Jackson</p>
-                            <p class="genero">Pop - 1982</p>
-                            <span class="precio">$45.000</span>
-                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
-                        </div>
-                    </article>
-
-                    <article class="producto-card">
-                        <div class="producto-imagen">
-                            <img src="https://cdn.shopify.com/s/files/1/0264/4075/2726/products/rumours-fleetwood-mac-vinyl-record.jpg" alt="Rumours">
-                            <div class="producto-overlay">
-                                <button class="ver-detalle-btn" onclick="verDetalle(9)">Ver Detalle</button>
-                            </div>
-                        </div>
-                        <div class="producto-info">
-                            <h3>Rumours</h3>
-                            <p class="artista">Fleetwood Mac</p>
-                            <p class="genero">Rock - 1977</p>
-                            <span class="precio">$33.000</span>
-                            <button class="agregar-carrito-btn">Agregar al Carrito</button>
-                        </div>
-                    </article>
+                <div class="productos-grid" id="productos-relacionados-grid">
+                    <!--los productos relacionados se cargarán dinámicamente-->
                 </div>
             </div>
         </section>
 
     </main>
 
-<footer class="footer">
+    <!--modal del carrito-->
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Mi Carrito</h2>
+                <button class="close-cart" onclick="cart.closeCart()">&times;</button>
+            </div>
+            <div class="cart-body">
+                <div id="cart-empty" class="cart-empty">
+                    <p>Tu carrito está vacío</p>
+                    <p>¡Agrega algunos vinilos!</p>
+                </div>
+                <div id="cart-items"></div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    Total: <span id="cart-total">$0</span>
+                </div>
+                <button class="checkout-btn" onclick="alert('¡Gracias por tu compra!')" disabled>
+                    Proceder al Pago
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
   <div class="footer-inner">
     <div class="footer-col">
       <h4 class="footer-title">Sobre VynilStore</h4>
@@ -102,180 +87,34 @@
 </footer>
 
 
+    <script src="productos.js"></script>
+    <script src="cart.js"></script>
     <script>
-        //base de datos de productos
-        const productos = {
-            1: {
-                nombre: "Led Zeppelin IV",
-                artista: "Led Zeppelin",
-                genero: "Rock",
-                año: "1971",
-                precio: "$25.000",
-                imagen: "https://www.musicworld.cl/img/cms/cd%20vinilos/led%20zeppelin/d2IV.jpg",
-                descripcion: "El cuarto álbum de estudio de Led Zeppelin, también conocido como 'Zoso' o 'Four Symbols'. Incluye clásicos como 'Stairway to Heaven', 'Black Dog' y 'Rock and Roll'.",
-                canciones: [
-                    "Black Dog",
-                    "Rock and Roll", 
-                    "The Battle of Evermore",
-                    "Stairway to Heaven",
-                    "Misty Mountain Hop",
-                    "Four Sticks",
-                    "Going to California",
-                    "When the Levee Breaks"
-                ],
-                duracion: "42:33",
-                formato: "Vinilo 12\"",
-                condicion: "Nuevo",
-                stock: 15,
-                etiqueta: "Atlantic Records"
-            },
-            2: {
-                nombre: "Back To Black",
-                artista: "Amy Winehouse",
-                genero: "Pop",
-                año: "2006",
-                precio: "$30.000",
-                imagen: "https://thesoundofvinyl.us/cdn/shop/products/Amy-Winehouse-Backl-To-Black-1LP-Vinyl.png?v=1661868011&width=1000",
-                descripcion: "El segundo y último álbum de estudio de Amy Winehouse. Una obra maestra que combina soul, jazz y R&B con letras profundas y emotivas.",
-                canciones: [
-                    "Rehab",
-                    "You Know I'm No Good",
-                    "Me & Mr Jones",
-                    "Just Friends",
-                    "Back to Black",
-                    "Love Is a Losing Game",
-                    "Tears Dry on Their Own",
-                    "Wake Up Alone",
-                    "Some Unholy War",
-                    "He Can Only Hold Her",
-                    "Addicted"
-                ],
-                duracion: "35:00",
-                formato: "Vinilo 12\"",
-                condicion: "Nuevo",
-                stock: 8,
-                etiqueta: "Island Records"
-            },
-            3: {
-                nombre: "Plastic Beach",
-                artista: "Gorillaz",
-                genero: "Pop",
-                año: "2010",
-                precio: "$28.000",
-                imagen: "https://cdn.webshopapp.com/shops/13847/files/405053016/gorillaz-plastic-beach-vinyl-2lp.jpg",
-                descripcion: "El tercer álbum de estudio de Gorillaz, un proyecto conceptual sobre la contaminación ambiental y la sociedad moderna.",
-                canciones: [
-                    "Orchestral Intro",
-                    "Welcome to the World of the Plastic Beach",
-                    "White Flag",
-                    "Rhinestone Eyes",
-                    "Stylo",
-                    "Superfast Jellyfish",
-                    "Empire Ants",
-                    "Glitter Freeze",
-                    "Some Kind of Nature",
-                    "On Melancholy Hill",
-                    "Broken",
-                    "Sweepstakes",
-                    "Plastic Beach",
-                    "To Binge",
-                    "Cloud of Unknowing",
-                    "Pirate Jet"
-                ],
-                duracion: "56:46",
-                formato: "Vinilo 12\" Doble LP",
-                condicion: "Nuevo",
-                stock: 12,
-                etiqueta: "Parlophone"
-            },
-            4: {
-                nombre: "Kind of Blue",
-                artista: "Miles Davis",
-                genero: "Jazz",
-                año: "1959",
-                precio: "$35.000",
-                imagen: "https://cdn.shopify.com/s/files/1/0264/4075/2726/products/kind-of-blue-miles-davis-vinyl-record.jpg",
-                descripcion: "Considerado uno de los mejores álbumes de jazz de todos los tiempos. Una obra maestra del jazz modal que revolucionó el género.",
-                canciones: [
-                    "So What",
-                    "Freddie Freeloader",
-                    "Blue in Green",
-                    "All Blues",
-                    "Flamenco Sketches"
-                ],
-                duracion: "45:44",
-                formato: "Vinilo 12\"",
-                condicion: "Nuevo",
-                stock: 6,
-                etiqueta: "Columbia Records"
-            },
-            5: {
-                nombre: "The Dark Side of the Moon",
-                artista: "Pink Floyd",
-                genero: "Rock",
-                año: "1973",
-                precio: "$32.000",
-                imagen: "https://cdn.shopify.com/s/files/1/0264/4075/2726/products/dark-side-of-the-moon-pink-floyd-vinyl-record.jpg",
-                descripcion: "Una de las obras más influyentes del rock progresivo. Un álbum conceptual que explora temas como la locura, el tiempo y la muerte.",
-                canciones: [
-                    "Speak to Me",
-                    "Breathe (In the Air)",
-                    "On the Run",
-                    "Time",
-                    "The Great Gig in the Sky",
-                    "Money",
-                    "Us and Them",
-                    "Any Colour You Like",
-                    "Brain Damage",
-                    "Eclipse"
-                ],
-                duracion: "42:49",
-                formato: "Vinilo 12\"",
-                condicion: "Nuevo",
-                stock: 10,
-                etiqueta: "Harvest Records"
-            },
-            6: {
-                nombre: "Symphony No. 9",
-                artista: "Beethoven",
-                genero: "Clásica",
-                año: "1824",
-                precio: "$40.000",
-                imagen: "https://cdn.shopify.com/s/files/1/0264/4075/2726/products/beethoven-symphony-no-9-vinyl-record.jpg",
-                descripcion: "La novena sinfonía de Beethoven, también conocida como 'Coral'. Una de las obras más importantes de la música clásica.",
-                canciones: [
-                    "Allegro ma non troppo, un poco maestoso",
-                    "Molto vivace",
-                    "Adagio molto e cantabile",
-                    "Presto - Allegro assai",
-                    "Ode to Joy"
-                ],
-                duracion: "74:00",
-                formato: "Vinilo 12\" Doble LP",
-                condicion: "Nuevo",
-                stock: 4,
-                etiqueta: "Deutsche Grammophon"
+        //cargar el detalle del producto usando el sistema dinámico
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productoId = parseInt(urlParams.get('id'));
+            
+            //obtener producto del sessionStorage o del productManager
+            let producto = null;
+            const productoGuardado = sessionStorage.getItem('productoDetalle');
+            
+            if (productoGuardado) {
+                producto = JSON.parse(productoGuardado);
+                sessionStorage.removeItem('productoDetalle'); //limpiar después de usar
+            } else if (typeof productManager !== 'undefined') {
+                producto = productManager.getProductoById(productoId);
             }
-        };
-
-        //obtener el id del producto de la url
-        const urlParams = new URLSearchParams(window.location.search);
-        const productoId = urlParams.get('id');
-
-        //cargar el detalle del producto
-        function cargarDetalleProducto() {
-            //accedemos al arreglo con el id obtenido
-            const producto = productos[productoId];
+            
             if (!producto) {
-                //manejo de error en caso de que no exista
                 document.getElementById('detalle-producto').innerHTML = '<h2>Producto no encontrado</h2>';
                 return;
             }
-
-            //generamos el HTML del detalle del producto
+            
+            //generar HTML del detalle del producto
             const detalleHTML = `
                 <div class="detalle-imagen">
-                    <img src="${producto.imagen}" alt="${producto.nombre}">
+                    <img src="${producto.imagen}" alt="${producto.nombre}" loading="lazy">
                 </div>
                 <div class="detalle-info">
                     <div class="detalle-header">
@@ -285,8 +124,11 @@
                     </div>
                     
                     <div class="detalle-precio">
-                        <span class="precio-detalle">${producto.precio}</span>
-                        <span class="stock-info">Stock: ${producto.stock} unidades</span>
+                        <span class="precio-detalle">$${producto.precio.toLocaleString()}</span>
+                        <span class="stock-info ${producto.stock <= producto.stockCritico ? 'stock-critico' : ''}">
+                            Stock: ${producto.stock} unidades
+                            ${producto.stock <= producto.stockCritico ? ' - ¡Últimas unidades!' : ''}
+                        </span>
                     </div>
 
                     <div class="detalle-descripcion">
@@ -297,18 +139,10 @@
                     <div class="detalle-especificaciones">
                         <h3>Especificaciones</h3>
                         <ul>
-                            <li><strong>Duración:</strong> ${producto.duracion}</li>
-                            <li><strong>Formato:</strong> ${producto.formato}</li>
-                            <li><strong>Condición:</strong> ${producto.condicion}</li>
-                            <li><strong>Etiqueta:</strong> ${producto.etiqueta}</li>
+                            <li><strong>Categoría:</strong> ${producto.categoria}</li>
+                            <li><strong>Stock Crítico:</strong> ${producto.stockCritico} unidades</li>
+                            <li><strong>Estado:</strong> ${producto.stock > 0 ? 'Disponible' : 'Sin Stock'}</li>
                         </ul>
-                    </div>
-
-                    <div class="detalle-canciones">
-                        <h3>Lista de Canciones</h3>
-                        <ol>
-                            ${producto.canciones.map(cancion => `<li>${cancion}</li>`).join('')}
-                        </ol>
                     </div>
 
                     <div class="detalle-acciones">
@@ -318,35 +152,65 @@
                                 ${Array.from({length: Math.min(10, producto.stock)}, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('')}
                             </select>
                         </div>
-                        <button class="comprar-btn" onclick="agregarAlCarrito(${productoId})">Agregar al Carrito</button>
-                        <button class="comprar-ahora-btn" onclick="comprarAhora(${productoId})">Comprar Ahora</button>
+                        <button class="comprar-btn" onclick="agregarAlCarrito(${producto.id})" ${producto.stock === 0 ? 'disabled' : ''}>
+                            ${producto.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito'}
+                        </button>
+                        <button class="comprar-ahora-btn" onclick="comprarAhora(${producto.id})" ${producto.stock === 0 ? 'disabled' : ''}>
+                            ${producto.stock === 0 ? 'Sin Stock' : 'Comprar Ahora'}
+                        </button>
                     </div>
                 </div>
             `;
-
+            
             document.getElementById('detalle-producto').innerHTML = detalleHTML;
+            
+            //cargar productos relacionados
+            cargarProductosRelacionados(productoId);
+        });
+        
+        //cargar productos relacionados
+        function cargarProductosRelacionados(productoIdExcluir) {
+            if (typeof productManager === 'undefined') return;
+            
+            const productosRelacionados = productManager.getAllProductos().filter(producto => producto.id !== productoIdExcluir);
+            const productosGrid = document.getElementById('productos-relacionados-grid');
+            
+            if (!productosGrid || productosRelacionados.length === 0) return;
+            
+            productosGrid.innerHTML = '';
+            
+            //mostrar máximo 3 productos relacionados
+            productosRelacionados.slice(0, 3).forEach(producto => {
+                const productoCard = productManager.createProductCard(producto);
+                productosGrid.appendChild(productoCard);
+            });
         }
-
+        
         //funciones para las acciones del carrito
         function agregarAlCarrito(productoId) {
-            const producto = productos[productoId];
-            const cantidad = document.getElementById('cantidad').value;
-            alert(`¡${cantidad} ${cantidad > 1 ? 'copias' : 'copia'} de "${producto.nombre}" agregada${cantidad > 1 ? 's' : ''} al carrito!`);
+            if (typeof productManager !== 'undefined') {
+                productManager.agregarAlCarrito(productoId);
+            } else {
+                alert('Error: Sistema de productos no disponible');
+            }
         }
 
         function comprarAhora(productoId) {
-            const producto = productos[productoId];
-            const cantidad = document.getElementById('cantidad').value;
-            alert(`Redirigiendo al checkout para comprar ${cantidad} ${cantidad > 1 ? 'copias' : 'copia'} de "${producto.nombre}"`);
+            if (typeof productManager !== 'undefined') {
+                const producto = productManager.getProductoById(productoId);
+                const cantidad = document.getElementById('cantidad').value;
+                
+                //agregar al carrito y proceder al checkout
+                productManager.agregarAlCarrito(productoId);
+                
+                //simular redirección al checkout
+                setTimeout(() => {
+                    alert(`Redirigiendo al checkout para comprar ${cantidad} ${cantidad > 1 ? 'copias' : 'copia'} de "${producto.nombre}"`);
+                }, 500);
+            } else {
+                alert('Error: Sistema de productos no disponible');
+            }
         }
-
-        //función para ver detalle de productos relacionados
-        function verDetalle(productoId) {
-            window.location.href = `detalle-producto.html?id=${productoId}`;
-        }
-
-        //cargar el detalle cuando la página esté lista
-        document.addEventListener('DOMContentLoaded', cargarDetalleProducto);
     </script>
 </body>
 </html>

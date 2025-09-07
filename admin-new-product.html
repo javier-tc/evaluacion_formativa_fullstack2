@@ -65,70 +65,64 @@
 
             <div class="admin-content">
                 <div class="content-section">
-                    <form class="admin-form" id="newProductForm">
+                    <form class="admin-form" id="newProductForm" novalidate>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="productName">Nombre del Producto *</label>
-                                <input type="text" id="productName" name="productName" required>
+                                <label for="codigoProducto">Código Producto *</label>
+                                <input type="text" id="codigoProducto" name="codigoProducto" required minlength="3">
+                                <span class="error-message" id="codigoProducto-error"></span>
                             </div>
                             
                             <div class="form-group">
-                                <label for="artist">Artista *</label>
-                                <input type="text" id="artist" name="artist" required>
+                                <label for="productName">Nombre *</label>
+                                <input type="text" id="productName" name="productName" required maxlength="100">
+                                <span class="error-message" id="productName-error"></span>
                             </div>
                             
                             <div class="form-group">
-                                <label for="year">Año de Lanzamiento *</label>
-                                <input type="number" id="year" name="year" min="1900" max="2024" required>
+                                <label for="description">Descripción</label>
+                                <textarea id="description" name="description" rows="3" maxlength="500" placeholder="Descripción opcional del producto"></textarea>
+                                <span class="error-message" id="description-error"></span>
                             </div>
                             
                             <div class="form-group">
-                                <label for="category">Categoría *</label>
+                                <label for="price">Precio *</label>
+                                <input type="number" id="price" name="price" min="0" step="0.01" required>
+                                <span class="error-message" id="price-error"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="stock">Stock *</label>
+                                <input type="number" id="stock" name="stock" min="0" required>
+                                <span class="error-message" id="stock-error"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="stockCritico">Stock Crítico</label>
+                                <input type="number" id="stockCritico" name="stockCritico" min="0">
+                                <span class="error-message" id="stockCritico-error"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="category">Categorías *</label>
                                 <select id="category" name="category" required>
                                     <option value="">Seleccionar categoría</option>
                                     <option value="rock">Rock</option>
                                     <option value="jazz">Jazz</option>
                                     <option value="pop">Pop</option>
-                                    <option value="classical">Clásica</option>
+                                    <option value="clasica">Clásica</option>
                                     <option value="electronic">Electrónica</option>
                                     <option value="folk">Folk</option>
                                     <option value="blues">Blues</option>
                                     <option value="reggae">Reggae</option>
                                 </select>
+                                <span class="error-message" id="category-error"></span>
                             </div>
                             
                             <div class="form-group">
-                                <label for="price">Precio (CLP) *</label>
-                                <input type="number" id="price" name="price" min="0" step="1000" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="stock">Stock Disponible *</label>
-                                <input type="number" id="stock" name="stock" min="0" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="imageUrl">URL de la Imagen *</label>
-                                <input type="url" id="imageUrl" name="imageUrl" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="status">Estado *</label>
-                                <select id="status" name="status" required>
-                                    <option value="active">Activo</option>
-                                    <option value="inactive">Inactivo</option>
-                                    <option value="out-of-stock">Sin Stock</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="description">Descripción del Producto</label>
-                                <textarea id="description" name="description" rows="4" placeholder="Describe el producto, incluye detalles sobre el álbum, la edición, etc."></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="tracklist">Lista de Canciones</label>
-                                <textarea id="tracklist" name="tracklist" rows="6" placeholder="Lista las canciones del álbum, una por línea"></textarea>
+                                <label for="imageUrl">Imagen</label>
+                                <input type="url" id="imageUrl" name="imageUrl" placeholder="URL de la imagen (opcional)">
+                                <span class="error-message" id="imageUrl-error"></span>
                             </div>
                         </div>
                         

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Blog - VinylStore</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <h1><a href="index.html" class="nav-brand-link">VinylStore</a></h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Inicio</a></li>
+                <li><a href="productos.html" class="nav-link">Productos</a></li>
+                <li><a href="blogs.html" class="nav-link nav-btn active">Blogs</a></li>
+                <li><a href="login.html" class="nav-link">Ingresar</a></li>
+                <li><a href="registro.html" class="nav-link nav-btn">Registrarse</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="detalle-blog-seccion">
+            <div class="detalle-container">
+                <div class="detalle-blog" id="detalle-blog">
+                    <!--el contenido se cargará dinámicamente con javascript-->
+                </div>
+            </div>
+        </section>
+
+        <section class="blogs-relacionados">
+            <div class="blogs-container">
+                <h2>Otros Artículos</h2>
+                <div class="blogs-grid" id="blogs-relacionados-grid">
+                    <!--los blogs relacionados se cargarán dinámicamente-->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <h4 class="footer-title">Sobre VinylStore</h4>
+                <ul class="footer-links">
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <p class="footer-copy">&copy; 2024 VinylStore. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="blogs.js"></script>
+    <script>
+        //cargar el detalle del blog usando el sistema dinámico
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const blogId = parseInt(urlParams.get('id'));
+            
+            //obtener blog del sessionStorage o del blogManager
+            let blog = null;
+            const blogGuardado = sessionStorage.getItem('blogDetalle');
+            
+            if (blogGuardado) {
+                blog = JSON.parse(blogGuardado);
+                sessionStorage.removeItem('blogDetalle'); //limpiar después de usar
+            } else if (typeof blogManager !== 'undefined') {
+                blog = blogManager.getBlogById(blogId);
+            }
+            
+            if (!blog) {
+                document.getElementById('detalle-blog').innerHTML = '<h2>Artículo no encontrado</h2>';
+                return;
+            }
+            
+            //actualizar título de la página
+            document.title = `${blog.titulo} - VinylStore`;
+            
+            //generar HTML del detalle del blog
+            const detalleHTML = `
+                <div class="detalle-blog-header">
+                    <div class="blog-imagen-principal">
+                        <img src="${blog.imagen}" alt="${blog.titulo}" loading="lazy">
+                    </div>
+                    <div class="blog-info-principal">
+                        <h1>${blog.titulo}</h1>
+                        <div class="blog-meta-detalle">
+                            <span class="blog-fecha-detalle">${blogManager.formatFecha(blog.fecha)}</span>
+                            <span class="blog-autor-detalle">Por ${blog.autor}</span>
+                            <span class="blog-categoria-detalle">${blog.categoria}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detalle-blog-contenido">
+                    <div class="blog-descripcion-corta">
+                        <p><strong>${blog.descripcionCorta}</strong></p>
+                    </div>
+                    
+                    <div class="blog-descripcion-larga">
+                        ${blog.descripcionLarga.split('\n\n').map(parrafo => `<p>${parrafo}</p>`).join('')}
+                    </div>
+                    
+                    <div class="blog-acciones">
+                        <button class="compartir-btn" onclick="compartirBlog()">Compartir</button>
+                        <button class="volver-btn" onclick="window.location.href='blogs.html'">Volver a Blogs</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('detalle-blog').innerHTML = detalleHTML;
+            
+            //cargar blogs relacionados (excluyendo el actual)
+            cargarBlogsRelacionados(blogId);
+        });
+        
+        //cargar blogs relacionados
+        function cargarBlogsRelacionados(blogIdExcluir) {
+            if (typeof blogManager === 'undefined') return;
+            
+            const blogsRelacionados = blogManager.getAllBlogs().filter(blog => blog.id !== blogIdExcluir);
+            const blogsGrid = document.getElementById('blogs-relacionados-grid');
+            
+            if (!blogsGrid || blogsRelacionados.length === 0) return;
+            
+            blogsGrid.innerHTML = '';
+            
+            //mostrar máximo 3 blogs relacionados
+            blogsRelacionados.slice(0, 3).forEach(blog => {
+                const blogCard = blogManager.createBlogCard(blog);
+                blogsGrid.appendChild(blogCard);
+            });
+        }
+        
+        //función para compartir blog
+        function compartirBlog() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    text: 'Mira este artículo interesante de VinylStore',
+                    url: window.location.href
+                });
+            } else {
+                //fallback para navegadores que no soportan Web Share API
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('¡Enlace copiado al portapapeles!');
+                }).catch(() => {
+                    alert('No se pudo copiar el enlace. Por favor, cópialo manualmente: ' + url);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

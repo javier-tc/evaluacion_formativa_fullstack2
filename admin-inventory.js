@@ -112,6 +112,7 @@ function setupSearchAndFilters() {
     
     if (searchInput) {
         searchInput.addEventListener('input', function() {
+            console.log('searchInput', searchInput.value);
             filterProducts();
         });
     }

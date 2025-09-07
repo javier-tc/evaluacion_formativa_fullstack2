@@ -113,79 +113,71 @@
             <div class="admin-content">
                 <div class="content-section">
                     <div class="form-container-admin">
-                        <form id="editUserForm" class="admin-form">
+                        <form id="editUserForm" class="admin-form" novalidate>
                             <div class="form-grid">
                                 <div class="form-group">
+                                    <label for="run">RUN *</label>
+                                    <input type="text" id="run" name="run" required minlength="7" maxlength="9" placeholder="Ej: 19011022K" value="19011022K">
+                                    <span class="error-message" id="run-error"></span>
+                                </div>
+
+                                <div class="form-group">
                                     <label for="firstName">Nombre *</label>
-                                    <input type="text" id="firstName" name="firstName" value="María" required>
+                                    <input type="text" id="firstName" name="firstName" required maxlength="50" value="María">
                                     <span class="error-message" id="firstName-error"></span>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="lastName">Apellido *</label>
-                                    <input type="text" id="lastName" name="lastName" value="González" required>
+                                    <label for="lastName">Apellidos *</label>
+                                    <input type="text" id="lastName" name="lastName" required maxlength="100" value="González">
                                     <span class="error-message" id="lastName-error"></span>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="email">Email *</label>
-                                    <input type="email" id="email" name="email" value="maria.gonzalez@email.com" required>
+                                    <label for="email">Correo *</label>
+                                    <input type="email" id="email" name="email" required maxlength="100" value="maria.gonzalez@duoc.cl">
                                     <span class="error-message" id="email-error"></span>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="username">Nombre de Usuario *</label>
-                                    <input type="text" id="username" name="username" value="mariagonzalez" required>
-                                    <span class="error-message" id="username-error"></span>
+                                    <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                                    <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="1995-05-15">
+                                    <span class="error-message" id="fechaNacimiento-error"></span>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="password">Nueva Contraseña</label>
-                                    <input type="password" id="password" name="password" placeholder="Dejar vacío para mantener la actual">
-                                    <span class="error-message" id="password-error"></span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="confirmPassword">Confirmar Nueva Contraseña</label>
-                                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmar nueva contraseña">
-                                    <span class="error-message" id="confirmPassword-error"></span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="role">Rol *</label>
-                                    <select id="role" name="role" required>
-                                        <option value="user" selected>Usuario</option>
-                                        <option value="moderator">Moderador</option>
-                                        <option value="admin">Administrador</option>
+                                    <label for="tipoUsuario">Tipo de Usuario *</label>
+                                    <select id="tipoUsuario" name="tipoUsuario" required>
+                                        <option value="">Seleccionar tipo</option>
+                                        <option value="Administrador">Administrador</option>
+                                        <option value="Cliente" selected>Cliente</option>
+                                        <option value="Vendedor">Vendedor</option>
                                     </select>
-                                    <span class="error-message" id="role-error"></span>
+                                    <span class="error-message" id="tipoUsuario-error"></span>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="status">Estado *</label>
-                                    <select id="status" name="status" required>
-                                        <option value="active" selected>Activo</option>
-                                        <option value="inactive">Inactivo</option>
+                                    <label for="region">Región *</label>
+                                    <select id="region" name="region" required>
+                                        <option value="">Seleccionar región</option>
+                                        <!--las opciones se cargarán dinámicamente-->
                                     </select>
-                                    <span class="error-message" id="status-error"></span>
+                                    <span class="error-message" id="region-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="comuna">Comuna *</label>
+                                    <select id="comuna" name="comuna" required>
+                                        <option value="">Seleccionar comuna</option>
+                                        <!--las opciones se cargarán dinámicamente-->
+                                    </select>
+                                    <span class="error-message" id="comuna-error"></span>
                                 </div>
 
                                 <div class="form-group full-width">
-                                    <label for="phone">Teléfono</label>
-                                    <input type="tel" id="phone" name="phone" value="+56 9 1234 5678">
-                                    <span class="error-message" id="phone-error"></span>
-                                </div>
-
-                                <div class="form-group full-width">
-                                    <label for="address">Dirección</label>
-                                    <textarea id="address" name="address" rows="3">Av. Providencia 1234, Santiago</textarea>
-                                    <span class="error-message" id="address-error"></span>
-                                </div>
-
-                                <div class="form-group full-width">
-                                    <label for="notes">Notas</label>
-                                    <textarea id="notes" name="notes" rows="3" placeholder="Información adicional sobre el usuario...">Usuario registrado el 15/01/2024. Interesado en vinilos de rock clásico.</textarea>
-                                    <span class="error-message" id="notes-error"></span>
+                                    <label for="direccion">Dirección *</label>
+                                    <textarea id="direccion" name="direccion" rows="3" required maxlength="300" placeholder="Dirección completa">Av. Providencia 1234, Santiago</textarea>
+                                    <span class="error-message" id="direccion-error"></span>
                                 </div>
                             </div>
 
@@ -205,6 +197,7 @@
         </main>
     </div>
 
+    <script src="regiones-comunas.js"></script>
     <script src="admin-edit-user.js"></script>
 </body>
 </html>
