@@ -79,6 +79,84 @@ class ProductManager {
                 stock: 4,
                 stockCritico: 1,
                 descripcion: 'La novena sinfonía de Beethoven, conocida como "Oda a la Alegría", una de las obras más famosas de la música clásica.'
+            },
+            {
+                id: 7,
+                nombre: 'Abbey Road',
+                artista: 'The Beatles',
+                genero: 'Rock',
+                año: 1969,
+                precio: 38000,
+                imagen: 'https://ukstore.thebeatles.com/cdn/shop/files/abbey_road_1.png?v=1751901427',
+                categoria: 'rock',
+                stock: 9,
+                stockCritico: 3,
+                descripcion: 'Abbey Road es el duodécimo álbum de estudio de The Beatles, lanzado en el Reino Unido el 26 de septiembre de 1969 por Apple Records.'
+            },
+            {
+                id: 8,
+                nombre: 'Thriller',
+                artista: 'Michael Jackson',
+                genero: 'Pop',
+                año: 1982,
+                precio: 45000,
+                imagen: 'https://thesoundofvinyl.com/cdn/shop/files/SharedImage-135521.png?v=1748042884',
+                categoria: 'pop',
+                stock: 6,
+                stockCritico: 2,
+                descripcion: 'Thriller es el sexto álbum de estudio del cantante estadounidense Michael Jackson, publicado el 29 de noviembre de 1982 por Epic Records.'
+            },
+            {
+                id: 9,
+                nombre: 'Rumours',
+                artista: 'Fleetwood Mac',
+                genero: 'Rock',
+                año: 1977,
+                precio: 33000,
+                imagen: 'https://store.warnermusic.ca/cdn/shop/files/record_mockup_ecdd1143-314b-4d83-aaba-b60c647c15e1_1024x1024.jpg?v=1748278596',
+                categoria: 'rock',
+                stock: 12,
+                stockCritico: 4,
+                descripcion: 'Rumours es el undécimo álbum de estudio de la banda británica de rock Fleetwood Mac, publicado en 1977 por Warner Bros. Records.'
+            },
+            {
+                id: 10,
+                nombre: 'Swag',
+                artista: 'Justin Bieber',
+                genero: 'Pop',
+                año: 2025,
+                precio: 55990,
+                imagen: 'https://shop.universalmusic.dk/cdn/shop/files/Horace_2LP_4.png?v=1752226281&width=2000',
+                categoria: 'pop',
+                stock: 8,
+                stockCritico: 3,
+                descripcion: 'Swag es el séptimo álbum de estudio del cantautor canadiense Justin Bieber.'
+            },
+            {
+                id: 11,
+                nombre: 'Appetite For Destruction',
+                artista: 'Guns N\' Roses',
+                genero: 'Rock',
+                año: 2025,
+                precio: 49990,
+                imagen: 'https://www.baba.es/51399-large_default/guns-n-roses-appetite-for-destruction-lp-vinilo-red-indies.jpg',
+                categoria: 'rock',
+                stock: 15,
+                stockCritico: 5,
+                descripcion: 'Álbum de debut de la legendaria banda de hard rock. Uno de los discos más aclamados por crítica y público y más vendidos de todos los tiempos.'
+            },
+            {
+                id: 12,
+                nombre: 'Eternal Sunshine',
+                artista: 'Ariana Grande',
+                genero: 'Pop',
+                año: 2024,
+                precio: 44990,
+                imagen: 'https://umusicstore.cl/cdn/shop/files/eternal_sunshine_1_2.png?v=1726244738&width=800',
+                categoria: 'pop',
+                stock: 7,
+                stockCritico: 3,
+                descripcion: 'Eternal Sunshine es el séptimo álbum de estudio de la cantautora estadounidense Ariana Grande. Es su primer álbum en tres años, tras el lanzamiento de Positions (2020).'
             }
         ];
         this.categoriaActual = 'todos';
