@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contacto - VinylStore</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav">
+      <div class="nav-brand">
+        <h1><a class="nav-brand-link" href="index.html">VinylStore</a></h1>
+      </div>
+      <ul class="nav-menu">
+        <!--la navegación se carga dinámicamente según el rol del usuario-->
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h2>Contacto</h2>
+        <p>¿Tienes alguna pregunta? ¡Escríbenos!</p>
+      </div>
+    </section>
+
+    <section class="form-container">
+      <div class="form-card">
+        <h2>Formulario de Contacto</h2>
+        <p class="form-subtitle">Completa el formulario y nos pondremos en contacto contigo</p>
+        
+        <form class="form" id="contact-form">
+          <div class="form-group">
+            <label for="nombre">Nombre completo *</label>
+            <input type="text" id="nombre" name="nombre" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="correo">Correo electrónico *</label>
+            <input type="email" id="correo" name="correo" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="asunto">Asunto *</label>
+            <input type="text" id="asunto" name="asunto" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="descripcion">Comentario *</label>
+            <textarea id="descripcion" name="descripcion" rows="5" required placeholder="Escribe tu mensaje aquí..."></textarea>
+          </div>
+          
+          <button type="submit" class="submit-btn">Enviar Mensaje</button>
+        </form>
+        
+        <div class="form-footer">
+          <p>También puedes contactarnos directamente:</p>
+          <p>📧 Email: info@vinylstore.cl</p>
+          <p>📞 Teléfono: +56 9 1234 5678</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/js/cart.js"></script>
+  <script src="../assets/js/contacto.js"></script>
+  <script src="../utils/sistema-roles.js"></script>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4 class="footer-title">Sobre VynilStore</h4>
+        <ul class="footer-links">
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </div>
+      <p class="footer-copy">&copy; 2024 VinylStore. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</body>
+</html>

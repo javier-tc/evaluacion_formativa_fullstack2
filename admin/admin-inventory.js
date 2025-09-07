@@ -112,6 +112,7 @@ function setupSearchAndFilters() {
     
     if (searchInput) {
         searchInput.addEventListener('input', function() {
+            console.log('searchInput', searchInput.value);
             filterProducts();
         });
     }
@@ -173,6 +174,10 @@ function createProductRow(product) {
     const categoryClass = product.category;
     const statusClass = product.status;
     
+    //verificar stock crítico
+    const stockCritico = product.stockCritico || 5; //valor por defecto
+    const stockAlerta = product.stock <= stockCritico ? 'stock-critico' : '';
+    
     row.innerHTML = `
         <td>${product.id}</td>
         <td>
@@ -189,7 +194,7 @@ function createProductRow(product) {
         <td>${product.artist}</td>
         <td><span class="category-badge ${categoryClass}">${getCategoryDisplayName(product.category)}</span></td>
         <td>$${product.price.toLocaleString()}</td>
-        <td>${product.stock}</td>
+        <td class="${stockAlerta}">${product.stock}</td>
         <td><span class="status-badge ${statusClass}">${getStatusDisplayName(product.status)}</span></td>
         <td>
             <div class="action-buttons">
@@ -202,6 +207,13 @@ function createProductRow(product) {
             </div>
         </td>
     `;
+    
+    //mostrar alerta si el stock es crítico
+    if (product.stock <= stockCritico) {
+        setTimeout(() => {
+            alert(`¡ALERTA! El producto "${product.name}" tiene stock crítico (${product.stock} unidades). Stock crítico: ${stockCritico}`);
+        }, 100);
+    }
     
     return row;
 }

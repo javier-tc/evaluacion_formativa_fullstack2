@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle del Producto - VinylStore</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body>
     <header class="header">
@@ -13,11 +13,7 @@
                 <h1><a href="index.html" class="nav-brand-link">VinylStore</a></h1>
             </div>
             <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Inicio</a></li>
-                <li><a href="productos.html" class="nav-link nav-btn">Productos</a></li>
-                <li><a href="blogs.html" class="nav-link">Blogs</a></li>
-                <li><a href="login.html" class="nav-link">Ingresar</a></li>
-                <li><a href="registro.html" class="nav-link nav-btn">Registrarse</a></li>
+                <!--la navegación se carga dinámicamente según el rol del usuario-->
             </ul>
         </nav>
     </header>
@@ -330,13 +326,23 @@
         //funciones para las acciones del carrito
         function agregarAlCarrito(productoId) {
             const producto = productos[productoId];
-            const cantidad = document.getElementById('cantidad').value;
-            alert(`¡${cantidad} ${cantidad > 1 ? 'copias' : 'copia'} de "${producto.nombre}" agregada${cantidad > 1 ? 's' : ''} al carrito!`);
+            const cantidad = parseInt(document.getElementById('cantidad').value);
+            
+            //agregar la cantidad especificada al carrito
+            for (let i = 0; i < cantidad; i++) {
+                cart.addToCart(productoId, producto.nombre, producto.precio, producto.imagen, producto.artista);
+            }
         }
 
         function comprarAhora(productoId) {
             const producto = productos[productoId];
-            const cantidad = document.getElementById('cantidad').value;
+            const cantidad = parseInt(document.getElementById('cantidad').value);
+            
+            //agregar al carrito y proceder al checkout
+            for (let i = 0; i < cantidad; i++) {
+                cart.addToCart(productoId, producto.nombre, producto.precio, producto.imagen, producto.artista);
+            }
+            
             alert(`Redirigiendo al checkout para comprar ${cantidad} ${cantidad > 1 ? 'copias' : 'copia'} de "${producto.nombre}"`);
         }
 
@@ -348,5 +354,31 @@
         //cargar el detalle cuando la página esté lista
         document.addEventListener('DOMContentLoaded', cargarDetalleProducto);
     </script>
-</body>
-</html>
+
+    <!--modal del carrito-->
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Mi Carrito</h2>
+                <button class="close-cart" onclick="cart.closeCart()">&times;</button>
+            </div>
+            <div class="cart-body">
+                <div id="cart-empty" class="cart-empty">
+                    <p>Tu carrito está vacío</p>
+                    <p>¡Agrega algunos vinilos!</p>
+                </div>
+                <div id="cart-items"></div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    Total: <span id="cart-total">$0</span>
+                </div>
+                <button class="checkout-btn" onclick="alert('¡Gracias por tu compra!')" disabled>
+                    Proceder al Pago
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/cart.js"></script>
+    <script src="../utils/sistema-roles.js"></script>

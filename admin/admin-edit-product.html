@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuevo Producto - VinylStore</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Editar Producto - VinylStore</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="admin-body">
@@ -53,7 +53,7 @@
         <main class="admin-main">
             <header class="admin-header">
                 <div class="header-content">
-                    <h1>Nuevo Producto</h1>
+                    <h1>Editar Producto</h1>
                     <div class="header-actions">
                         <button class="btn-secondary" onclick="window.location.href='admin-inventory.html'">
                             <i class="fas fa-arrow-left"></i>
@@ -65,8 +65,13 @@
 
             <div class="admin-content">
                 <div class="content-section">
-                    <form class="admin-form" id="newProductForm">
+                    <form class="admin-form" id="editProductForm">
                         <div class="form-grid">
+                            <div class="form-group">
+                                <label for="productId">ID del Producto</label>
+                                <input type="text" id="productId" name="productId" readonly>
+                            </div>
+                            
                             <div class="form-group">
                                 <label for="productName">Nombre del Producto *</label>
                                 <input type="text" id="productName" name="productName" required>
@@ -138,7 +143,7 @@
                             </button>
                             <button type="submit" class="btn-primary">
                                 <i class="fas fa-save"></i>
-                                Crear Producto
+                                Guardar Cambios
                             </button>
                         </div>
                     </form>
@@ -147,6 +152,6 @@
         </main>
     </div>
 
-    <script src="admin-new-product.js"></script>
+    <script src="admin-edit-product.js"></script>
 </body>
 </html>

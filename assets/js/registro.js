@@ -42,9 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (email.trim() === '') {
             return 'El email es obligatorio';
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\s@]+@(admin\.cl|vendedor\.cl|duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/;
         if (!emailRegex.test(email)) {
-            return 'Ingresa un email válido';
+            return 'Solo se permiten correos con @admin.cl, @vendedor.cl, @duoc.cl, @profesor.duoc.cl y @gmail.com';
         }
         return '';
     }

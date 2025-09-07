@@ -28,9 +28,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (email.trim() === '') {
             return 'El email es obligatorio';
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email.length > 100) {
+            return 'El email no puede exceder 100 caracteres';
+        }
+        const emailRegex = /^[^\s@]+@(admin\.cl|vendedor\.cl|duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/;
         if (!emailRegex.test(email)) {
-            return 'Ingresa un email válido';
+            return 'Solo se permiten correos con @admin.cl, @vendedor.cl, @duoc.cl, @profesor.duoc.cl y @gmail.com';
         }
         return '';
     }
@@ -40,8 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (password === '') {
             return 'La contraseña es obligatoria';
         }
-        if (password.length < 6) {
-            return 'La contraseña debe tener al menos 6 caracteres';
+        if (password.length < 4) {
+            return 'La contraseña debe tener al menos 4 caracteres';
+        }
+        if (password.length > 10) {
+            return 'La contraseña no puede exceder 10 caracteres';
         }
         return '';
     }
@@ -112,20 +118,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = document.getElementById('password').value;
             
             setTimeout(() => {
-                //credenciales de administrador (en producción esto vendría del backend)
-                if (email === 'admin@vinylstore.cl' && password === 'admin123') {
-                    //redirigir al panel de administrador
-                    window.location.href = 'admin.html';
+                //usar sistema de roles para login
+                if (simularLogin(email, password)) {
+                    const usuarioActual = JSON.parse(localStorage.getItem('usuario_actual'));
+                    alert(`¡Bienvenido ${usuarioActual.nombre}!`);
+                    
+                    //redirigir según rol
+                    if (usuarioActual.rol === 'Administrador') {
+                        window.location.href = 'admin.html';
+                    } else if (usuarioActual.rol === 'Vendedor') {
+                        window.location.href = 'admin-inventory.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
                 } else {
-                    //login normal de usuario
-                    alert('¡Bienvenido de vuelta a VinylStore!');
-                    form.reset();
-                    inputs.forEach(input => {
-                        if (input.type !== 'checkbox') {
-                            input.parentElement.classList.remove('success', 'error');
-                        }
-                    });
+                    alert('Credenciales inválidas. Usa admin@admin.cl, vendedor@vendedor.cl o cliente@gmail.com con contraseña 123456');
                 }
+                
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Ingresar';
             }, 1500);

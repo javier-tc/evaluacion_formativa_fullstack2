@@ -154,40 +154,71 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('tracklist').value = product.tracklist || '';
     }
     
-    //validación de datos del producto
+    //validación de datos del producto según requerimientos
     function validateProductData(data) {
+        //validar código producto (requerido, texto, min 3 caracteres)
+        const codigoProducto = formData.get('codigoProducto');
+        if (!codigoProducto || codigoProducto.trim() === '') {
+            alert('El código del producto es requerido');
+            return false;
+        }
+        if (codigoProducto.length < 3) {
+            alert('El código del producto debe tener al menos 3 caracteres');
+            return false;
+        }
+        
+        //validar nombre (requerido, max 100 caracteres)
         if (!data.name || data.name.trim() === '') {
-            // showAlert('El nombre del producto es requerido', 'error');
+            alert('El nombre del producto es requerido');
+            return false;
+        }
+        if (data.name.length > 100) {
+            alert('El nombre del producto no puede exceder 100 caracteres');
             return false;
         }
         
-        if (!data.artist || data.artist.trim() === '') {
-            // showAlert('El artista es requerido', 'error');
+        //validar descripción (opcional, max 500 caracteres)
+        if (data.description && data.description.length > 500) {
+            alert('La descripción no puede exceder 500 caracteres');
             return false;
         }
         
-        if (!data.year || data.year < 1900 || data.year > 2024) {
-            // showAlert('El año debe estar entre 1900 y 2024', 'error');
+        //validar precio (requerido, min 0, puede ser decimal)
+        if (data.price === null || data.price === undefined || data.price < 0) {
+            alert('El precio debe ser mayor o igual a 0');
             return false;
         }
         
+        //validar stock (requerido, min 0, solo números enteros)
+        if (data.stock === null || data.stock === undefined || data.stock < 0) {
+            alert('El stock debe ser mayor o igual a 0');
+            return false;
+        }
+        if (!Number.isInteger(data.stock)) {
+            alert('El stock debe ser un número entero');
+            return false;
+        }
+        
+        //validar stock crítico (opcional, min 0, solo números enteros)
+        const stockCritico = parseInt(formData.get('stockCritico'));
+        if (stockCritico && stockCritico < 0) {
+            alert('El stock crítico debe ser mayor o igual a 0');
+            return false;
+        }
+        if (stockCritico && !Number.isInteger(stockCritico)) {
+            alert('El stock crítico debe ser un número entero');
+            return false;
+        }
+        
+        //validar categoría (requerido)
         if (!data.category) {
-            // showAlert('Debe seleccionar una categoría', 'error');
+            alert('Debe seleccionar una categoría');
             return false;
         }
         
-        if (!data.price || data.price <= 0) {
-            // showAlert('El precio debe ser mayor a 0', 'error');
-            return false;
-        }
-        
-        if (data.stock < 0) {
-            // showAlert('El stock no puede ser negativo', 'error');
-            return false;
-        }
-        
-        if (!data.imageUrl || !isValidUrl(data.imageUrl)) {
-            // showAlert('Debe proporcionar una URL válida para la imagen', 'error');
+        //validar imagen (opcional)
+        if (data.imageUrl && !isValidUrl(data.imageUrl)) {
+            alert('Debe proporcionar una URL válida para la imagen');
             return false;
         }
         
@@ -216,19 +247,22 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         
         //simular delay de red
-        setTimeout(() => {
-            //simular éxito
+        // setTimeout(() => {
+        //     //simular éxito
             
-            //restaurar botón
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+        //     //restaurar botón
+        //     submitBtn.innerHTML = originalText;
+        //     submitBtn.disabled = false;
             
-            //redirigir al inventario después de un breve delay
-            setTimeout(() => {
-                window.location.href = 'admin-inventory.html';
-            }, 1500);
+        //     //redirigir al inventario después de un breve delay
+        //     setTimeout(() => {
+        //         window.location.href = 'admin-inventory.html';
+        //     }, 1500);
             
-        }, 2000);
+        // }, 2000);
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        window.location.href = 'admin-inventory.html';
     }
     
     

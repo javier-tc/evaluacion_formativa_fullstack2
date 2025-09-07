@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blogs - VinylStore</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav">
+      <div class="nav-brand">
+        <h1><a href="index.html" class="nav-brand-link">VinylStore</a></h1>
+      </div>
+      <ul class="nav-menu">
+        <!--la navegación se carga dinámicamente según el rol del usuario-->
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h2>Blogs</h2>
+      </div>
+    </section>
+
+    <section class="blogs" id="blogs">
+      <h2>Últimas publicaciones</h2>
+
+      <div class="blogs-grid">
+        <!--los blogs se cargan dinámicamente desde blogs.js-->
+      </div>
+    </section>
+  </main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <h4 class="footer-title">Sobre VynilStore</h4>
+      <ul class="footer-links">
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+    </div>
+    <p class="footer-copy">&copy; 2024 VinylStore. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+  <script src="../assets/js/blogs.js"></script>
+  <script src="../utils/sistema-roles.js"></script>
+</body>
+</html>

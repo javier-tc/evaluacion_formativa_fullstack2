@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos - VinylStore</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <h1><a href="index.html" class="nav-brand-link">VinylStore</a></h1>
+            </div>
+            <ul class="nav-menu">
+                <!--la navegación se carga dinámicamente según el rol del usuario-->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero productos-hero">
+            <div class="hero-content">
+                <h2>Nuestra Colección de Vinilos</h2>
+                <p>Descubre miles de títulos únicos y ediciones especiales</p>
+            </div>
+        </section>
+
+        <section class="productos-seccion">
+            <div class="productos-container">
+                <div class="productos-filtros">
+                    <h3>Filtrar por:</h3>
+                    <div class="filtros-opciones">
+                        <button class="filtro-btn active" data-categoria="todos">Todos</button>
+                        <button class="filtro-btn" data-categoria="rock">Rock</button>
+                        <button class="filtro-btn" data-categoria="jazz">Jazz</button>
+                        <button class="filtro-btn" data-categoria="pop">Pop</button>
+                        <button class="filtro-btn" data-categoria="clasica">Clásica</button>
+                    </div>
+                </div>
+
+                <div class="productos-grid" id="productos-grid">
+                    <!--los productos se cargan dinámicamente desde productos.js-->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <h4 class="footer-title">Sobre VynilStore</h4>
+      <ul class="footer-links">
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+    </div>
+    <p class="footer-copy">&copy; 2024 VinylStore. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+
+
+    <script src="cart.js"></script>
+    <script src="productos.js"></script>
+    <script src="sistema-roles.js"></script>
+</body>
+</html>
