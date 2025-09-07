@@ -33,37 +33,37 @@ document.addEventListener('DOMContentLoaded', function() {
     //validación de datos del producto
     function validateProductData(data) {
         if (!data.name || data.name.trim() === '') {
-            showAlert('El nombre del producto es requerido', 'error');
+            // showAlert('El nombre del producto es requerido', 'error');
             return false;
         }
         
         if (!data.artist || data.artist.trim() === '') {
-            showAlert('El artista es requerido', 'error');
+            // showAlert('El artista es requerido', 'error');
             return false;
         }
         
-        if (!data.year || data.year < 1900 || data.year > 2024) {
-            showAlert('El año debe estar entre 1900 y 2024', 'error');
+        if (!data.year || data.year < 1900 || data.year > 2025) {
+            // showAlert('El año debe estar entre 1900 y 2025', 'error');
             return false;
         }
         
         if (!data.category) {
-            showAlert('Debe seleccionar una categoría', 'error');
+            // showAlert('Debe seleccionar una categoría', 'error');
             return false;
         }
         
         if (!data.price || data.price <= 0) {
-            showAlert('El precio debe ser mayor a 0', 'error');
+            // showAlert('El precio debe ser mayor a 0', 'error');
             return false;
         }
         
         if (data.stock < 0) {
-            showAlert('El stock no puede ser negativo', 'error');
+            // showAlert('El stock no puede ser negativo', 'error');
             return false;
         }
         
         if (!data.imageUrl || !isValidUrl(data.imageUrl)) {
-            showAlert('Debe proporcionar una URL válida para la imagen', 'error');
+            // showAlert('Debe proporcionar una URL válida para la imagen', 'error');
             return false;
         }
         
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
         //simular delay de red
         setTimeout(() => {
             //simular éxito
-            showAlert('Producto creado exitosamente', 'success');
+            // showAlert('Producto creado exitosamente', 'success');
             
             //limpiar formulario
             form.reset();
@@ -111,40 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
     
-    //mostrar alertas
-    function showAlert(message, type) {
-        //crear elemento de alerta
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type}`;
-        alert.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${message}</span>
-            <button onclick="this.parentElement.remove()">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
-        
-        //insertar al inicio del contenido
-        const content = document.querySelector('.admin-content');
-        content.insertBefore(alert, content.firstChild);
-        
-        //remover automáticamente después de 5 segundos
-        setTimeout(() => {
-            if (alert.parentElement) {
-                alert.remove();
-            }
-        }, 5000);
-    }
     
-    //previsualización de imagen
-    const imageUrlInput = document.getElementById('imageUrl');
-    imageUrlInput.addEventListener('blur', function() {
-        const url = this.value.trim();
-        if (url && isValidUrl(url)) {
-            //aquí se podría agregar una previsualización de la imagen
-            console.log('URL de imagen válida:', url);
-        }
-    });
     
     //formateo automático del precio
     const priceInput = document.getElementById('price');
@@ -156,14 +123,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    //validación en tiempo real del año
-    const yearInput = document.getElementById('year');
-    yearInput.addEventListener('input', function() {
-        const year = parseInt(this.value);
-        if (year < 1900 || year > 2024) {
-            this.setCustomValidity('El año debe estar entre 1900 y 2024');
-        } else {
-            this.setCustomValidity('');
-        }
-    });
 });

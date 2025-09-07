@@ -27,28 +27,28 @@ function updateStats() {
         const newValue = currentValue + Math.floor(Math.random() * 10);
         
         //animación de contador
-        animateCounter(stat, currentValue, newValue);
+        // animateCounter(stat, currentValue, newValue);
     });
 }
 
-function animateCounter(element, start, end) {
-    const duration = 1000;
-    const startTime = performance.now();
+// function animateCounter(element, start, end) {
+//     const duration = 1000;
+//     const startTime = performance.now();
     
-    function updateCounter(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+//     function updateCounter(currentTime) {
+//         const elapsed = currentTime - startTime;
+//         const progress = Math.min(elapsed / duration, 1);
         
-        const current = Math.floor(start + (end - start) * progress);
-        element.textContent = formatNumber(current);
+//         const current = Math.floor(start + (end - start) * progress);
+//         element.textContent = formatNumber(current);
         
-        if (progress < 1) {
-            requestAnimationFrame(updateCounter);
-        }
-    }
+//         if (progress < 1) {
+//             requestAnimationFrame(updateCounter);
+//         }
+//     }
     
-    requestAnimationFrame(updateCounter);
-}
+//     requestAnimationFrame(updateCounter);
+// }
 
 function formatNumber(num) {
     if (num >= 1000000) {
@@ -176,40 +176,40 @@ function setupResponsiveNavigation() {
 }
 
 //funciones de utilidad
-function showMessage(message, type = 'info') {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `admin-message ${type}`;
-    messageDiv.textContent = message;
+// function showMessage(message, type = 'info') {
+//     const messageDiv = document.createElement('div');
+//     messageDiv.className = `admin-message ${type}`;
+//     messageDiv.textContent = message;
     
-    messageDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 1rem 1.5rem;
-        border-radius: 5px;
-        color: white;
-        font-weight: 600;
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-    `;
+//     messageDiv.style.cssText = `
+//         position: fixed;
+//         top: 20px;
+//         right: 20px;
+//         padding: 1rem 1.5rem;
+//         border-radius: 5px;
+//         color: white;
+//         font-weight: 600;
+//         z-index: 10000;
+//         animation: slideIn 0.3s ease;
+//     `;
     
-    //estilos según tipo
-    if (type === 'success') {
-        messageDiv.style.backgroundColor = '#2ecc71';
-    } else if (type === 'error') {
-        messageDiv.style.backgroundColor = '#e74c3c';
-    } else {
-        messageDiv.style.backgroundColor = '#3498db';
-    }
+//     //estilos según tipo
+//     if (type === 'success') {
+//         messageDiv.style.backgroundColor = '#2ecc71';
+//     } else if (type === 'error') {
+//         messageDiv.style.backgroundColor = '#e74c3c';
+//     } else {
+//         messageDiv.style.backgroundColor = '#3498db';
+//     }
     
-    document.body.appendChild(messageDiv);
+//     document.body.appendChild(messageDiv);
     
-    //remover después de 3 segundos
-    setTimeout(() => {
-        messageDiv.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => messageDiv.remove(), 300);
-    }, 3000);
-}
+//     //remover después de 3 segundos
+//     setTimeout(() => {
+//         messageDiv.style.animation = 'slideOut 0.3s ease';
+//         setTimeout(() => messageDiv.remove(), 300);
+//     }, 3000);
+// }
 
 //agregar estilos de animación
 const style = document.createElement('style');
