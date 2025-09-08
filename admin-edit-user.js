@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             run: '19011022K',
             firstName: 'María',
             lastName: 'González',
-            email: 'maria.gonzalez@duoc.cl',
+            email: 'maria.gonzalez@duocuc.cl',
             fechaNacimiento: '1995-05-15',
             tipoUsuario: 'Cliente',
             region: 'Metropolitana',

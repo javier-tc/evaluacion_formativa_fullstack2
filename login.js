@@ -116,13 +116,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isValid) {
             //simular proceso de login
             const submitBtn = form.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Ingresando...';
+            // submitBtn.disabled = true;
+            // submitBtn.textContent = 'Ingresando...';
             
             //verificar si es administrador
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
+            console.log(email, password);
             setTimeout(() => {
                 //credenciales de administrador (en producción esto vendría del backend)
                 if (email === 'admin@gmail.com' && password === 'admin123') {
