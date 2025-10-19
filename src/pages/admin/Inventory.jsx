@@ -1,0 +1,1 @@
+export default function Inventory(){return <main className='section-base app-main'><h2>Inventario</h2></main>}

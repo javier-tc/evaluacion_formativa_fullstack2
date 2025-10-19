@@ -1,0 +1,1 @@
+export default function Users(){return <main className='section-base app-main'><h2>Usuarios</h2></main>}

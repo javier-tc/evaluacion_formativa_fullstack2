@@ -1,0 +1,1 @@
+export default function Dashboard(){return <main className='section-base app-main'><h2>Admin Dashboard</h2></main>}
