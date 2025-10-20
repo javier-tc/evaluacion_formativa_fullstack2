@@ -7,7 +7,7 @@ export function CartProvider({children}){
   const remove=id=>setItems(p=>p.filter(i=>i.id!==id));
   const clear=()=>setItems([]);
   const totalItems=useMemo(()=>items.reduce((s,i)=>s+i.qty,0),[items]);
-  const totalPrice=useMemo(()=>items.reduce((s,i)=>s+i.qty*i.price,0),[items]);
+  const totalPrice=useMemo(()=>items.reduce((s,i)=>s+(i.qty || 0)*(Number(i.precio) || Number(i.price) || 0),0),[items]);
   return <Ctx.Provider value={{items,add,remove,clear,totalItems,totalPrice}}>{children}</Ctx.Provider>
 }
 export const useCart=()=>useContext(Ctx);

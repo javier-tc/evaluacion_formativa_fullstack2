@@ -11,9 +11,9 @@ export default function DetalleProducto() {
 
   if (!product) {
     return (
-      <main className="section-base app-main">
+      <div className="section-base">
         <div className="container"><h2>Producto no encontrado</h2></div>
-      </main>
+      </div>
     );
   }
 
@@ -24,16 +24,16 @@ export default function DetalleProducto() {
   const handleAdd = () => {
     add({
       id: product.id,
-      name: product.nombre,
-      price: product.precio,
-      image: product.imagen,
-      artist: product.artista,
+      nombre: product.nombre,
+      precio: product.precio,
+      imagen: product.imagen,
+      artista: product.artista,
       qty,
     });
   };
 
   return (
-    <main className="app-main">
+    <>
       <section className="section-base">
         <div className="container">
 
@@ -116,7 +116,7 @@ export default function DetalleProducto() {
 
                   <button
                     className="btn-base btn-orange"
-                    onClick={() => add({ id:p.id, name:p.nombre, price:p.precio, image:p.imagen, artist:p.artista })}
+                    onClick={() => add({ id:p.id, nombre:p.nombre, precio:p.precio, imagen:p.imagen, artista:p.artista })}
                   >
                     Agregar al Carrito
                   </button>
@@ -127,6 +127,6 @@ export default function DetalleProducto() {
 
         </div>
       </section>
-    </main>
+    </>
   );
 }

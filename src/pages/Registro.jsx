@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "../contexts/ToastContext.jsx";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 /* Reglas de validación */
 function validateNombre(nombre) {
@@ -66,6 +67,7 @@ export default function Registro() {
 
   const toast = useToast();
   const nav = useNavigate();
+  const { register } = useAuth();
 
   const validateField = (name, value) => {
     let msg = "";
@@ -113,7 +115,7 @@ export default function Registro() {
     if (errors[name]) validateField(name, val);
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     // Validar todo
@@ -134,31 +136,57 @@ export default function Registro() {
 
     setLoading(true);
 
-    // Simular alta de usuario 
-    setTimeout(() => {
-      //  API y guardar el usuario
-      toast.success("¡Cuenta creada exitosamente! Bienvenido a VinylStore. ✅");
+    try {
+      //usar la nueva función de register del AuthContext
+      const userData = {
+        nombre: form.nombre,
+        apellidos: '', //se puede agregar al formulario si es necesario
+        email: form.email,
+        telefono: form.telefono,
+        password: form.password,
+        role: 'user',
+        direccion: {
+          calle: '',
+          departamento: '',
+          region: '',
+          comuna: '',
+          indicaciones: ''
+        }
+      };
 
-      // limpiar y redirigir a login
-      setForm({
-        nombre: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        telefono: "",
-        terminos: false,
-      });
-      setErrors({
-        nombre: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        telefono: "",
-        terminos: "",
-      });
+      const result = register(userData);
+      
+      if (result.success) {
+        toast.success("¡Cuenta creada exitosamente! Bienvenido a VinylStore.");
+        
+        //limpiar formulario
+        setForm({
+          nombre: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          telefono: "",
+          terminos: false,
+        });
+        setErrors({
+          nombre: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          telefono: "",
+          terminos: "",
+        });
+        
+        //redirigir al inicio
+        nav("/");
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error("Error inesperado. Por favor intenta nuevamente.");
+    } finally {
       setLoading(false);
-      nav("/login");
-    }, 900);
+    }
   };
 
   return (

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "../contexts/ToastContext.jsx";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 /* Reglas de validación*/
 
-const allowedDomains = ["@duoc.cl", "@profesor.duoc.cl", "@gmail.com"];
+const allowedDomains = ["@duoc.cl", "@profesor.duoc.cl", "@gmail.com", "@duocuc.cl"];
 
 function validateEmail(value) {
   const email = (value || "").trim();
@@ -14,14 +15,17 @@ function validateEmail(value) {
   if (!emailRegex.test(email)) return "Ingresa un email válido";
   const hasValidDomain = allowedDomains.some((d) => email.endsWith(d));
   if (!hasValidDomain)
-    return "Solo se permiten correos de @duoc.cl, @profesor.duoc.cl y @gmail.com";
+    return "Solo se permiten correos de @duoc.cl, @profesor.duoc.cl, @duocuc.cl y @gmail.com";
   return "";
 }
 
 function validatePassword(password) {
   if (!password) return "La contraseña es obligatoria";
-  if (password.length < 4) return "La contraseña debe tener al menos 4 caracteres";
+  if (password.length < 6) return "La contraseña debe tener al menos 6 caracteres";
   if (password.length > 10) return "La contraseña no puede exceder 10 caracteres";
+  if (!/(?=.*[a-z])/.test(password)) return "La contraseña debe contener al menos una minúscula";
+  if (!/(?=.*[A-Z])/.test(password)) return "La contraseña debe contener al menos una mayúscula";
+  if (!/(?=.*\d)/.test(password)) return "La contraseña debe contener al menos un número";
   return "";
 }
 
@@ -35,6 +39,7 @@ export default function Login() {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const toast = useToast();
   const nav = useNavigate();
+  const { login } = useAuth();
 
   // Validación en tiempo real / blur 
   const validateField = (name, value) => {
@@ -71,19 +76,27 @@ export default function Login() {
 
     setLoading(true);
 
-    // Simular login como en tu setTimeout original
-    setTimeout(() => {
-      // Credenciales admin
-      if (email === "admin@gmail.com" && pass === "admin123") {
-        toast.success("¡Bienvenido, administrador! ✅");
-        nav("/admin");
+    try {
+      //usar la nueva función de login del AuthContext
+      const result = login(email, pass);
+      
+      if (result.success) {
+        toast.success(`¡Bienvenido ${result.user.nombre}!`);
+        
+        //redirigir según el rol del usuario
+        if (result.user.role === 'admin') {
+          nav('/admin');
+        } else {
+          nav('/');
+        }
       } else {
-        toast.success("¡Bienvenido de vuelta a VinylStore! ✅");
-        // “Recordar sesión” 
-        nav("/");
+        toast.error(result.error);
       }
+    } catch (error) {
+      toast.error("Error inesperado. Por favor intenta nuevamente.");
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   return (

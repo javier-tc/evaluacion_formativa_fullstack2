@@ -8,13 +8,13 @@ export default function DetalleBlog() {
   const otros = BLOGS.filter((x) => String(x.id) !== String(id)).slice(0, 3);
 
   if (!b) return (
-    <main className="section-base app-main">
+    <div className="section-base">
       <h2>Publicación no encontrada</h2>
-    </main>
+    </div>
   );
 
   return (
-    <main className="app-main">
+    <>
       <section className="section-base">
         <div className="container">
           <div className="blog-hero">
@@ -58,6 +58,6 @@ export default function DetalleBlog() {
           </section>
         </div>
       </section>
-    </main>
+    </>
   );
 }

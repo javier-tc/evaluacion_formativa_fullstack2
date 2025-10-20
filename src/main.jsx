@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./styles/styles.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastProvider } from "./contexts/ToastContext.jsx"; // sin "s"
 
 createRoot(document.getElementById("root")).render(

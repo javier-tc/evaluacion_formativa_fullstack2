@@ -5,7 +5,7 @@ import { BLOGS } from "../data/blogs.js";
 export default function Blogs() {
   const nav = useNavigate();
   return (
-    <main className="app-main">
+    <>
       <section className="page-hero"><h2>Blogs</h2></section>
 
       <section className="section-base">
@@ -36,6 +36,6 @@ export default function Blogs() {
           ))}
         </div>
       </section>
-    </main>
+    </>
   );
 }

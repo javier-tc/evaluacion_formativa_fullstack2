@@ -7,16 +7,23 @@ import { useToast } from "../contexts/ToastContext.jsx";
 export default function Home() {
   const navigate = useNavigate();
   const { add } = useCart();
-  const toast = useToast(); // <-- dentro del componente
+  const toast = useToast(); //dentro del componente
   const destacados = PRODUCTS.slice(0, 3);
 
+  //función para agregar producto al carrito
   const handleAdd = (p) => {
-    add({ id: p.id, name: p.nombre, price: p.precio, image: p.imagen, artist: p.artista });
+    add({ 
+      id: p.id, 
+      nombre: p.nombre, 
+      precio: p.precio, 
+      imagen: p.imagen, 
+      artista: p.artista 
+    });
     toast.success(`Se agregó "${p.nombre}" al carrito`);
   };
 
   return (
-    <main className="app-main">
+    <>
       <section className="section-hero">
         <div className="hero-content">
           <h2>Descubre la Magia del Vinilo</h2>
@@ -66,6 +73,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-    </main>
+    </>
   );
 }

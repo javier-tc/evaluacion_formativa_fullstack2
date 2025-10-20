@@ -3,7 +3,7 @@ export default function Contacto(){
   const [f,setF]=useState({nombre:'',email:'',mensaje:''});
   const onChange=e=>setF(s=>({...s,[e.target.name]:e.target.value}));
   const submit=e=>{e.preventDefault(); alert('Mensaje enviado (demo)'); setF({nombre:'',email:'',mensaje:''});};
-  return (<main className="app-main">
+  return (<>
     <section className="section-hero"><div className="hero-content"><h2>Contacto</h2><p>¿Tienes alguna pregunta? ¡Escríbenos!</p></div></section>
     <section className="section-base">
       <div className="card form-card">
@@ -16,5 +16,5 @@ export default function Contacto(){
         </form>
       </div>
     </section>
-  </main>);
+  </>);
 }
