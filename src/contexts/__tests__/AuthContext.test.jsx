@@ -10,7 +10,7 @@ const TestComponent = () => {
       <div data-testid="user">{user ? user.email : 'null'}</div>
       <div data-testid="is-admin">{isAdmin() ? 'true' : 'false'}</div>
       <div data-testid="is-authenticated">{isAuthenticated() ? 'true' : 'false'}</div>
-      <button data-testid="login-btn" onClick={() => login('test@test.com', 'admin', 'Test User')}>
+      <button data-testid="login-btn" onClick={() => login('admin@duocuc.cl', 'Admin123')}>
         Login
       </button>
       <button data-testid="logout-btn" onClick={logout}>
@@ -59,7 +59,7 @@ describe('AuthContext', () => {
       fireEvent.click(screen.getByTestId('login-btn'));
     });
 
-    expect(screen.getByTestId('user')).toHaveTextContent('test@test.com');
+    expect(screen.getByTestId('user')).toHaveTextContent('admin@duocuc.cl');
     expect(screen.getByTestId('is-admin')).toHaveTextContent('true');
     expect(screen.getByTestId('is-authenticated')).toHaveTextContent('true');
   });
@@ -108,7 +108,7 @@ describe('AuthContext', () => {
     });
 
     //verificar que el usuario se guardó en el estado (funcionalidad principal)
-    expect(screen.getByTestId('user')).toHaveTextContent('test@test.com');
+    expect(screen.getByTestId('user')).toHaveTextContent('admin@duocuc.cl');
     expect(screen.getByTestId('is-admin')).toHaveTextContent('true');
     
     //nota: localStorage puede no funcionar correctamente en el entorno de pruebas
@@ -171,10 +171,10 @@ describe('AuthContext', () => {
           <div data-testid="user">{user ? user.email : 'null'}</div>
           <div data-testid="is-admin">{isAdmin() ? 'true' : 'false'}</div>
           <div data-testid="is-authenticated">{isAuthenticated() ? 'true' : 'false'}</div>
-          <button data-testid="admin-login-btn" onClick={() => login('admin@test.com', 'admin', 'Admin User')}>
+          <button data-testid="admin-login-btn" onClick={() => login('admin@duocuc.cl', 'Admin123')}>
             Login Admin
           </button>
-          <button data-testid="user-login-btn" onClick={() => login('user@test.com', 'user', 'Normal User')}>
+          <button data-testid="user-login-btn" onClick={() => login('maria.gonzalez@duocuc.cl', 'Pass123')}>
             Login User
           </button>
         </div>

@@ -20,9 +20,9 @@ export const USERS_DB = [
   },
   {
     id: 2,
-    nombre: 'Carlos',
-    apellidos: 'Ruiz Silva',
-    email: 'carlos.ruiz@duocuc.cl',
+    nombre: 'Admin',
+    apellidos: 'Admin',
+    email: 'admin@duocuc.cl',
     telefono: '+56 9 2345 6789',
     direccion: {
       calle: 'Calle Las Flores 567',

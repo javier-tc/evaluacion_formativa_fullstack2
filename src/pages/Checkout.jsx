@@ -16,11 +16,17 @@ const Checkout = () => {
         nombre: user?.nombre || '',
         apellidos: user?.apellidos || '',
         email: user?.email || '',
+        telefono: user?.telefono || '',
         calle: user?.direccion?.calle || '',
         departamento: user?.direccion?.departamento || '',
         region: user?.direccion?.region || '',
         comuna: user?.direccion?.comuna || '',
-        indicaciones: user?.direccion?.indicaciones || ''
+        indicaciones: user?.direccion?.indicaciones || '',
+        metodoPago: 'tarjeta',
+        numeroTarjeta: '',
+        cvv: '',
+        fechaVencimiento: '',
+        nombreTarjeta: ''
     });
 
     const [errores, setErrores] = useState({});
@@ -48,6 +54,7 @@ const Checkout = () => {
         if (!formData.nombre.trim()) nuevosErrores.nombre = 'El nombre es requerido';
         if (!formData.apellidos.trim()) nuevosErrores.apellidos = 'Los apellidos son requeridos';
         if (!formData.email.trim()) nuevosErrores.email = 'El email es requerido';
+        if (!formData.telefono.trim()) nuevosErrores.telefono = 'El teléfono es requerido';
         if (!formData.calle.trim()) nuevosErrores.calle = 'La calle es requerida';
         if (!formData.region.trim()) nuevosErrores.region = 'La región es requerida';
         if (!formData.comuna.trim()) nuevosErrores.comuna = 'La comuna es requerida';
@@ -56,6 +63,14 @@ const Checkout = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (formData.email && !emailRegex.test(formData.email)) {
             nuevosErrores.email = 'El formato del email no es válido';
+        }
+
+        //validar campos de tarjeta si método de pago es tarjeta
+        if (formData.metodoPago === 'tarjeta') {
+            if (!formData.numeroTarjeta.trim()) nuevosErrores.numeroTarjeta = 'El número de tarjeta es requerido';
+            if (!formData.cvv.trim()) nuevosErrores.cvv = 'El CVV es requerido';
+            if (!formData.fechaVencimiento.trim()) nuevosErrores.fechaVencimiento = 'La fecha de vencimiento es requerida';
+            if (!formData.nombreTarjeta.trim()) nuevosErrores.nombreTarjeta = 'El nombre en la tarjeta es requerido';
         }
 
         setErrores(nuevosErrores);
@@ -205,7 +220,7 @@ const Checkout = () => {
                                 </Row>
 
                                 <Row>
-                                    <Col md={12}>
+                                    <Col md={6}>
                                         <Form.Group className="mb-3">
                                             <Form.Label>Correo Electrónico *</Form.Label>
                                             <Form.Control
@@ -218,6 +233,22 @@ const Checkout = () => {
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 {errores.email}
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Teléfono *</Form.Label>
+                                            <Form.Control
+                                                type="tel"
+                                                name="telefono"
+                                                value={formData.telefono}
+                                                onChange={handleInputChange}
+                                                isInvalid={!!errores.telefono}
+                                                placeholder="+56 9 1234 5678"
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                {errores.telefono}
                                             </Form.Control.Feedback>
                                         </Form.Group>
                                     </Col>
@@ -316,6 +347,101 @@ const Checkout = () => {
                                     </Col>
                                 </Row>
 
+                                <hr />
+
+                                {/*método de pago*/}
+                                <h5 className="mb-3">Método de Pago</h5>
+                                <Row>
+                                    <Col md={12}>
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Método de Pago</Form.Label>
+                                            <Form.Select
+                                                name="metodoPago"
+                                                value={formData.metodoPago}
+                                                onChange={handleInputChange}
+                                            >
+                                                <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                                                <option value="transferencia">Transferencia Bancaria</option>
+                                                <option value="contraentrega">Pago Contra Entrega</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+
+                                {formData.metodoPago === 'tarjeta' && (
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Número de tarjeta *</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name="numeroTarjeta"
+                                                    value={formData.numeroTarjeta}
+                                                    onChange={handleInputChange}
+                                                    isInvalid={!!errores.numeroTarjeta}
+                                                    placeholder="1234 5678 9012 3456"
+                                                />
+                                                <Form.Control.Feedback type="invalid">
+                                                    {errores.numeroTarjeta}
+                                                </Form.Control.Feedback>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={3}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>CVV *</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name="cvv"
+                                                    value={formData.cvv}
+                                                    onChange={handleInputChange}
+                                                    isInvalid={!!errores.cvv}
+                                                    placeholder="123"
+                                                />
+                                                <Form.Control.Feedback type="invalid">
+                                                    {errores.cvv}
+                                                </Form.Control.Feedback>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={3}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Fecha de vencimiento *</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name="fechaVencimiento"
+                                                    value={formData.fechaVencimiento}
+                                                    onChange={handleInputChange}
+                                                    isInvalid={!!errores.fechaVencimiento}
+                                                    placeholder="MM/AA"
+                                                />
+                                                <Form.Control.Feedback type="invalid">
+                                                    {errores.fechaVencimiento}
+                                                </Form.Control.Feedback>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                )}
+
+                                {formData.metodoPago === 'tarjeta' && (
+                                    <Row>
+                                        <Col md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Nombre en la tarjeta *</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name="nombreTarjeta"
+                                                    value={formData.nombreTarjeta}
+                                                    onChange={handleInputChange}
+                                                    isInvalid={!!errores.nombreTarjeta}
+                                                    placeholder="Juan Pérez"
+                                                />
+                                                <Form.Control.Feedback type="invalid">
+                                                    {errores.nombreTarjeta}
+                                                </Form.Control.Feedback>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                )}
+
                                 <Alert variant="info" className="mt-4">
                                     <i className="bi bi-info-circle me-2"></i>
                                     <strong>Información importante:</strong><br />
@@ -331,7 +457,7 @@ const Checkout = () => {
                                         size="lg"
                                         disabled={procesando}
                                     >
-                                        {procesando ? 'Procesando...' : `Confirmar Pedido - ${formatearPrecio(totalPrice)}`}
+                                        {procesando ? 'Procesando...' : `Pagar - ${formatearPrecio(totalPrice)}`}
                                     </Button>
 
                                     {/*botones de prueba para simular errores - solo visibles en desarrollo*/}

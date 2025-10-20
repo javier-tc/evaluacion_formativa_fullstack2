@@ -2511,12 +2511,14 @@ body {
 }
 
 .modal-content {
-    background: var(--white);
+    background: #ffffff !important;
     border-radius: 8px;
     max-width: 600px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e0e0e0;
 }
 
 .modal-header {
@@ -2525,6 +2527,7 @@ body {
     align-items: center;
     padding: 1.5rem;
     border-bottom: 1px solid #eee;
+    background: #ffffff;
 }
 
 .modal-header h3 {
@@ -2542,11 +2545,19 @@ body {
 
 .modal-body {
     padding: 1.5rem;
+    background: #ffffff;
+}
+
+.purchase-history {
+    background: #ffffff;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .history-table {
     width: 100%;
     border-collapse: collapse;
+    background: #ffffff;
 }
 
 .history-table th,
@@ -2554,6 +2565,7 @@ body {
     padding: 0.75rem;
     text-align: left;
     border-bottom: 1px solid #eee;
+    background: #ffffff;
 }
 
 .history-table th {

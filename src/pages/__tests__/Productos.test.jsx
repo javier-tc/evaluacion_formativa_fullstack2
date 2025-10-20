@@ -106,8 +106,8 @@ describe('Productos Component', () => {
   test('debe mostrar botones de ver detalle', () => {
     renderWithProviders(<Productos />);
     
-    //buscar botones que contengan "Ver" o "Detalle"
-    const detailButtons = screen.queryAllByText(/Ver|Detalle/);
+    //buscar botones que contengan "Ver" o "Detalles"
+    const detailButtons = screen.queryAllByText(/Ver|Detalles/);
     expect(detailButtons.length).toBeGreaterThan(0);
   });
 
@@ -133,8 +133,8 @@ describe('Productos Component', () => {
   test('debe manejar navegación a detalle de producto', () => {
     renderWithProviders(<Productos />);
     
-    //buscar botones que contengan "Ver" o "Detalle"
-    const detailButtons = screen.queryAllByText(/Ver|Detalle/);
+    //buscar botones que contengan "Ver" o "Detalles"
+    const detailButtons = screen.queryAllByText(/Ver|Detalles/);
     if (detailButtons.length > 0) {
       fireEvent.click(detailButtons[0]);
       //verificar que el botón es clickeable

@@ -64,8 +64,11 @@ describe('Home Component', () => {
     renderWithProviders(<Home />);
     
     //verificar que usa componentes de Bootstrap
-    const containers = screen.getAllByRole('main');
-    expect(containers[0]).toBeInTheDocument();
+    const sections = screen.getAllByRole('generic');
+    const heroSection = sections.find(section => 
+      section.className.includes('section-hero')
+    );
+    expect(heroSection).toBeInTheDocument();
   });
 
   test('debe manejar clics en botones de productos', () => {
