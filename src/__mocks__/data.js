@@ -89,3 +89,5 @@ export const mockRegionesComunas = {
   'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Concón', 'Quilpué'],
   'Biobío': ['Concepción', 'Talcahuano', 'Chiguayante', 'Hualpén']
 };
+
+

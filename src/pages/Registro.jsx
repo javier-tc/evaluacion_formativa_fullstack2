@@ -49,6 +49,7 @@ function validateTerminos(checked) {
 export default function Registro() {
   const [form, setForm] = useState({
     nombre: "",
+    apellido: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -57,6 +58,7 @@ export default function Registro() {
   });
   const [errors, setErrors] = useState({
     nombre: "",
+    apellido: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -74,6 +76,9 @@ export default function Registro() {
     switch (name) {
       case "nombre":
         msg = validateNombre(value);
+        break;
+      case "apellido":
+        msg = validateNombre(value); //usar la misma validación que nombre
         break;
       case "email":
         msg = validateEmail(value);
@@ -121,6 +126,7 @@ export default function Registro() {
     // Validar todo
     const msgs = {
       nombre: validateField("nombre", form.nombre),
+      apellido: validateField("apellido", form.apellido),
       email: validateField("email", form.email),
       password: validateField("password", form.password),
       confirmPassword: validateField("confirmPassword", form.confirmPassword),
@@ -138,49 +144,52 @@ export default function Registro() {
 
     try {
       //usar la nueva función de register del AuthContext
+      //la API espera: nombre, apellido (no apellidos), email, password (requeridos)
+      //y opcionalmente: telefono, direccion (string), region, comuna, rol
       const userData = {
         nombre: form.nombre,
-        apellidos: '', //se puede agregar al formulario si es necesario
+        apellido: form.apellido, //la API espera 'apellido' singular (requerido)
         email: form.email,
-        telefono: form.telefono,
+        telefono: form.telefono || '',
         password: form.password,
-        role: 'user',
-        direccion: {
-          calle: '',
-          departamento: '',
-          region: '',
-          comuna: '',
-          indicaciones: ''
-        }
+        direccion: '', //opcional, string simple
+        region: '', //opcional
+        comuna: '', //opcional
+        rol: 'Usuario' //la API espera 'Usuario' o 'Administrador' (con mayúscula)
       };
 
-      const result = register(userData);
+      const result = await register(userData);
       
       if (result.success) {
-        toast.success("¡Cuenta creada exitosamente! Bienvenido a VinylStore.");
-        
-        //limpiar formulario
-        setForm({
-          nombre: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-          telefono: "",
-          terminos: false,
-        });
-        setErrors({
-          nombre: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-          telefono: "",
-          terminos: "",
-        });
-        
-        //redirigir al inicio
-        nav("/");
+        if (result.requiresLogin) {
+          toast.success(result.message || "¡Cuenta creada exitosamente! Por favor inicia sesión.");
+          nav("/login");
+        } else {
+          toast.success("¡Cuenta creada exitosamente! Bienvenido a VinylStore.");
+          //limpiar formulario
+          setForm({
+            nombre: "",
+            apellido: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            telefono: "",
+            terminos: false,
+          });
+          setErrors({
+            nombre: "",
+            apellido: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            telefono: "",
+            terminos: "",
+          });
+          //redirigir al inicio
+          nav("/");
+        }
       } else {
-        toast.error(result.error);
+        toast.error(result.error || "Error al crear la cuenta");
       }
     } catch (error) {
       toast.error("Error inesperado. Por favor intenta nuevamente.");
@@ -197,7 +206,7 @@ export default function Registro() {
 
         {/* Nombre */}
         <div className={`form-group ${errors.nombre ? "error" : errors.nombre === "" && form.nombre ? "success" : ""}`}>
-          <label htmlFor="nombre">Nombre Completo *</label>
+          <label htmlFor="nombre">Nombre *</label>
           <input
             id="nombre"
             name="nombre"
@@ -208,6 +217,21 @@ export default function Registro() {
             onBlur={onBlur}
           />
           <small className="error-message">{errors.nombre}</small>
+        </div>
+
+        {/* Apellido */}
+        <div className={`form-group ${errors.apellido ? "error" : errors.apellido === "" && form.apellido ? "success" : ""}`}>
+          <label htmlFor="apellido">Apellido *</label>
+          <input
+            id="apellido"
+            name="apellido"
+            type="text"
+            placeholder="Tu apellido"
+            value={form.apellido}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+          <small className="error-message">{errors.apellido}</small>
         </div>
 
         {/* Email */}

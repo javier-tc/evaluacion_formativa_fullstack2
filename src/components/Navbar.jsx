@@ -73,7 +73,7 @@ export default function Navbar() {
               <span className="cart-icon">🛒</span> Carrito ({totalItems})
             </Nav.Link>
             
-            {user?.role === 'admin' && (
+            {(user?.rol === 'Administrador' || user?.rol === 'admin' || user?.role === 'admin' || user?.role === 'Administrador') && (
               <Nav.Link as={NavLink} to="/admin" onClick={handleNavClick}>
                 Admin
               </Nav.Link>

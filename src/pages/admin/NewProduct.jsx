@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminPageLayout from '../../components/AdminLayout';
+import { productosService, categoriasService } from '../../services/api.js';
+import { useToast } from '../../contexts/ToastContext.jsx';
 
 const NewProduct = () => {
   const navigate = useNavigate();
@@ -18,6 +20,52 @@ const NewProduct = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [categorias, setCategorias] = useState([]);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [creatingCategory, setCreatingCategory] = useState(false);
+  const [newCategoryError, setNewCategoryError] = useState('');
+  const toast = useToast();
+
+  useEffect(() => {
+    const loadCategorias = async () => {
+      try {
+        const categoriasData = await categoriasService.getAll();
+        setCategorias(categoriasData);
+      } catch (error) {
+        console.error('Error al cargar categorías:', error);
+      }
+    };
+    loadCategorias();
+  }, []);
+
+  const handleCreateCategory = async () => {
+    const nombre = newCategoryName.trim();
+    if (!nombre) {
+      setNewCategoryError('El nombre de la categoría es obligatorio');
+      return;
+    }
+    setNewCategoryError('');
+    setCreatingCategory(true);
+    try {
+      const nuevaCategoria = await categoriasService.create({ nombre });
+      const categoriaId = nuevaCategoria.id || nuevaCategoria.categoria_id;
+      setCategorias((prev) => [...prev, nuevaCategoria]);
+      if (categoriaId) {
+        setFormData((prev) => ({
+          ...prev,
+          category: String(categoriaId)
+        }));
+      }
+      setNewCategoryName('');
+      toast.success('Categoría creada exitosamente');
+    } catch (error) {
+      console.error('Error al crear categoría:', error);
+      toast.error('Error al crear la categoría');
+      setNewCategoryError('No se pudo crear la categoría. Intenta nuevamente.');
+    } finally {
+      setCreatingCategory(false);
+    }
+  };
 
   const validateField = (name, value) => {
     let error = '';
@@ -100,11 +148,19 @@ const NewProduct = () => {
       setMessage('');
       setMessageType('');
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log('Producto a crear:', formData);
-        setMessage(`¡Producto "${formData.productName}" creado exitosamente!`);
-        setMessageType('success');
+        const productoData = {
+          nombre: formData.productName,
+          artista: formData.artista || '',
+          precio: parseFloat(formData.price),
+          categoria_id: parseInt(formData.category, 10),
+          stock: parseInt(formData.stock, 10),
+          descripcion: formData.description || '',
+          imagen: formData.imageUrl || '',
+          activo: true
+        };
+        
+        await productosService.create(productoData);
+        toast.success(`¡Producto "${formData.productName}" creado exitosamente!`);
         setFormData({
           codigoProducto: '',
           productName: '',
@@ -118,6 +174,8 @@ const NewProduct = () => {
         setErrors({});
         setTimeout(() => navigate('/admin/inventory'), 1500);
       } catch (error) {
+        console.error('Error al crear producto:', error);
+        toast.error('Error al crear el producto');
         setMessage('Error al crear el producto.');
         setMessageType('error');
       } finally {
@@ -233,18 +291,41 @@ const NewProduct = () => {
 
             <div className={`form-group ${errors.category ? 'error' : ''}`}>
               <label htmlFor="category">Categorías *</label>
-              <select id="category" name="category" value={formData.category} onChange={handleChange} required>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+              >
                 <option value="">Seleccionar categoría</option>
-                <option value="rock">Rock</option>
-                <option value="jazz">Jazz</option>
-                <option value="pop">Pop</option>
-                <option value="clasica">Clásica</option>
-                <option value="electronic">Electrónica</option>
-                <option value="folk">Folk</option>
-                <option value="blues">Blues</option>
-                <option value="reggae">Reggae</option>
+                {Array.isArray(categorias) && categorias.map((cat) => (
+                  <option key={cat.id} value={String(cat.id)}>
+                    {cat.nombre}
+                  </option>
+                ))}
               </select>
               <span className="error-message">{errors.category}</span>
+              <div className="new-category-inline">
+                <input
+                  type="text"
+                  placeholder="Nueva categoría"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="btn-base btn-secondary"
+                  onClick={handleCreateCategory}
+                  disabled={creatingCategory}
+                >
+                  {creatingCategory ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-plus"></i>}
+                  {creatingCategory ? 'Creando...' : 'Añadir'}
+                </button>
+              </div>
+              {newCategoryError && (
+                <span className="error-message">{newCategoryError}</span>
+              )}
             </div>
 
             <div className={`form-group ${errors.imageUrl ? 'error' : ''}`}>

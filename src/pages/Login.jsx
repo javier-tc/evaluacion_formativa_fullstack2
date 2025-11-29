@@ -77,23 +77,27 @@ export default function Login() {
     setLoading(true);
 
     try {
-      //usar la nueva función de login del AuthContext
-      const result = login(email, pass);
+      //usar la nueva función de login del AuthContext (ahora asíncrona)
+      const result = await login(email, pass);
       
       if (result.success) {
-        toast.success(`¡Bienvenido ${result.user.nombre}!`);
+        const nombreUsuario = result.user?.nombre || result.user?.name || 'Usuario';
+        toast.success(`¡Bienvenido ${nombreUsuario}!`);
         
         //redirigir según el rol del usuario
-        if (result.user.role === 'admin') {
+        if (result.user.rol === 'Administrador' || result.user.rol === 'admin' || result.user.role === 'admin' || result.user.role === 'Administrador') {
           nav('/admin');
         } else {
           nav('/');
         }
       } else {
-        toast.error(result.error);
+        const errorMsg = result.error || 'Error al iniciar sesión';
+        toast.error(errorMsg);
+        console.error('Error de login:', result);
       }
     } catch (error) {
-      toast.error("Error inesperado. Por favor intenta nuevamente.");
+      console.error('Error inesperado en login:', error);
+      toast.error(error.message || "Error inesperado. Por favor intenta nuevamente.");
     } finally {
       setLoading(false);
     }

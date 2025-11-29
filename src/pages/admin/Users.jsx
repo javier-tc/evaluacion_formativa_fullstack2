@@ -1,83 +1,111 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminPageLayout from '../../components/AdminLayout';
+import { usuariosService, ordenesService } from '../../services/api.js';
+import { useToast } from '../../contexts/ToastContext.jsx';
 
 const Users = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  //datos simulados de usuarios
-  const users = [
-    {
-      id: 1,
-      name: 'María González',
-      username: '@mariagonzalez',
-      email: 'maria.gonzalez@duocuc.cl',
-      role: 'user',
-      status: 'active',
-      registrationDate: '15/01/2025',
-      purchaseHistory: [
-        { id: 'B001', fecha: '25/01/2025', total: 75000, productos: 3, estado: 'pagada' },
-        { id: 'B005', fecha: '20/01/2025', total: 30000, productos: 1, estado: 'pagada' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Carlos Ruiz',
-      username: '@carlosruiz',
-      email: 'carlos.ruiz@duocuc.cl',
-      role: 'admin',
-      status: 'active',
-      registrationDate: '10/01/2025',
-      purchaseHistory: [
-        { id: 'B002', fecha: '24/01/2025', total: 40000, productos: 1, estado: 'pendiente' }
-      ]
-    },
-    {
-      id: 3,
-      name: 'Ana Silva',
-      username: '@anasilva',
-      email: 'ana.silva@duocuc.cl',
-      role: 'moderator',
-      status: 'inactive',
-      registrationDate: '05/01/2025',
-      purchaseHistory: [
-        { id: 'B003', fecha: '23/01/2025', total: 28000, productos: 1, estado: 'pagada' }
-      ]
-    },
-    {
-      id: 4,
-      name: 'Luis Mendoza',
-      username: '@luismendoza',
-      email: 'luis.mendoza@duocuc.cl',
-      role: 'user',
-      status: 'active',
-      registrationDate: '20/01/2025',
-      purchaseHistory: [
-        { id: 'B004', fecha: '22/01/2025', total: 55000, productos: 2, estado: 'cancelada' }
-      ]
-    },
-    {
-      id: 5,
-      name: 'Patricia López',
-      username: '@patricialopez',
-      email: 'patricia.lopez@duocuc.cl',
-      role: 'user',
-      status: 'active',
-      registrationDate: '18/01/2025',
-      purchaseHistory: []
-    }
-  ];
+  const mapOrdenToHistoryItem = (orden) => {
+    const total =
+      orden.total ||
+      orden.totalOrden ||
+      orden.montoTotal ||
+      0;
+    const productosCount =
+      (Array.isArray(orden.detalle) && orden.detalle.length) ||
+      (Array.isArray(orden.items) && orden.items.length) ||
+      orden.cantidadProductos ||
+      0;
+    const fecha =
+      orden.fecha ||
+      orden.fechaOrden ||
+      orden.createdAt ||
+      '';
+    const estado =
+      orden.estado ||
+      orden.status ||
+      'desconocido';
 
-  //filtrar usuarios
+    return {
+      id: orden.id,
+      fecha,
+      total,
+      productos: productosCount,
+      estado
+    };
+  };
+
+  const mapUsuarioToRow = (user, purchaseHistory) => {
+    const nombreCompleto = `${user.nombre || ''} ${user.apellidos || ''}`.trim() || user.name || '';
+    const username =
+      user.username ||
+      (user.email ? `@${user.email.split('@')[0]}` : '');
+    const rol = user.rol || user.role || 'user';
+    const activo = typeof user.activo === 'boolean' ? user.activo : true;
+    const status = activo ? 'active' : 'inactive';
+    const registrationDate =
+      user.fechaRegistro ||
+      user.registrationDate ||
+      (user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-CL') : '');
+
+    return {
+      id: user.id,
+      name: nombreCompleto,
+      username,
+      email: user.email,
+      role: rol === 'Administrador' ? 'admin' : rol,
+      status,
+      registrationDate,
+      purchaseHistory
+    };
+  };
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      setLoading(true);
+      try {
+        const usuariosData = await usuariosService.getAll();
+        const usersWithHistory = await Promise.all(
+          usuariosData.map(async (user) => {
+            try {
+              const ordenes = await ordenesService.getAll(user.id);
+              const history = Array.isArray(ordenes)
+                ? ordenes.map(mapOrdenToHistoryItem)
+                : [];
+              return mapUsuarioToRow(user, history);
+            } catch (error) {
+              return mapUsuarioToRow(user, []);
+            }
+          })
+        );
+        setUsers(usersWithHistory);
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        toast.error('Error al cargar usuarios');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUsers();
+  }, [toast]);
+
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.username.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = !filterRole || user.role === filterRole;
-    
+    const nombre = user.name || '';
+    const email = user.email || '';
+    const username = user.username || '';
+    const rol = user.role || '';
+    const matchesSearch = nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         username.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = !filterRole || rol === filterRole;
     return matchesSearch && matchesRole;
   });
 
@@ -85,10 +113,16 @@ const Users = () => {
     navigate(`/admin/users/edit/${id}`);
   };
 
-  const handleDeleteUser = (id) => {
+  const handleDeleteUser = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
-      console.log('Eliminar usuario:', id);
-      //aquí iría la lógica para eliminar el usuario
+      try {
+        await usuariosService.delete(id);
+        toast.success('Usuario eliminado exitosamente');
+        setUsers(users.filter(u => u.id !== id));
+      } catch (error) {
+        console.error('Error al eliminar usuario:', error);
+        toast.error('Error al eliminar usuario');
+      }
     }
   };
 
@@ -175,7 +209,21 @@ const Users = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map(user => (
+              {loading && (
+                <tr>
+                  <td colSpan="7" className="text-center">
+                    <i className="fas fa-spinner fa-spin"></i> Cargando usuarios...
+                  </td>
+                </tr>
+              )}
+              {!loading && filteredUsers.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="text-center">
+                    No se encontraron usuarios
+                  </td>
+                </tr>
+              )}
+              {!loading && filteredUsers.map(user => (
                 <tr key={user.id}>
                   <td>{user.id}</td>
                   <td>

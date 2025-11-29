@@ -85,10 +85,14 @@ export default function Carrito() {
                             <Button 
                               variant="outline-secondary" 
                               size="sm"
-                              onClick={() => {
+                              onClick={async () => {
                                 if (item.qty > 1) {
-                                  remove(item.id);
-                                  add({...item, qty: item.qty - 1});
+                                  try {
+                                    await remove(item.id);
+                                    await add({...item, qty: item.qty - 1});
+                                  } catch (error) {
+                                    console.error('Error al actualizar cantidad:', error);
+                                  }
                                 }
                               }}
                               disabled={item.qty <= 1}
@@ -99,7 +103,13 @@ export default function Carrito() {
                             <Button 
                               variant="outline-secondary" 
                               size="sm"
-                              onClick={() => add(item)}
+                              onClick={async () => {
+                                try {
+                                  await add(item);
+                                } catch (error) {
+                                  console.error('Error al actualizar cantidad:', error);
+                                }
+                              }}
                             >
                               +
                             </Button>
@@ -110,7 +120,13 @@ export default function Carrito() {
                           <Button 
                             variant="outline-danger" 
                             size="sm"
-                            onClick={() => remove(item.id)}
+                            onClick={async () => {
+                              try {
+                                await remove(item.id);
+                              } catch (error) {
+                                console.error('Error al remover item:', error);
+                              }
+                            }}
                           >
                             <i className="bi bi-trash"></i>
                           </Button>
@@ -154,7 +170,13 @@ export default function Carrito() {
                   </Button>
                   <Button 
                     variant="outline-secondary"
-                    onClick={clear}
+                    onClick={async () => {
+                      try {
+                        await clear();
+                      } catch (error) {
+                        console.error('Error al vaciar carrito:', error);
+                      }
+                    }}
                   >
                     <i className="bi bi-trash me-2"></i>
                     Vaciar Carrito

@@ -113,7 +113,40 @@ const Checkout = () => {
             }
 
             if (pagoExitoso) {
-                clear(); //limpiar carrito
+                //crear orden en el backend
+                try {
+                    const { ordenesService } = await import('../services/api.js');
+                    const direccionCompleta = `${formData.calle}${formData.departamento ? ', ' + formData.departamento : ''}, ${formData.comuna}, ${formData.region}`;
+                    
+                    const ordenData = {
+                        usuario_id: user?.id,
+                        total: totalPrice,
+                        direccion_envio: direccionCompleta,
+                        telefono_contacto: formData.telefono,
+                        notas: formData.indicaciones || '',
+                        items: items.map(item => ({
+                            producto_id: item.id,
+                            cantidad: item.qty,
+                            precio_unitario: item.precio,
+                            subtotal: item.precio * item.qty
+                        }))
+                    };
+
+                    if (user?.id) {
+                        await ordenesService.createFromCarrito(user.id, {
+                            direccion_envio: direccionCompleta,
+                            telefono_contacto: formData.telefono,
+                            notas: formData.indicaciones || ''
+                        });
+                    } else {
+                        await ordenesService.create(ordenData);
+                    }
+                    
+                    await clear(); //limpiar carrito
+                } catch (error) {
+                    console.error('Error al crear orden:', error);
+                }
+                
                 navigate('/compra-exitosa', {
                     state: {
                         orden: {

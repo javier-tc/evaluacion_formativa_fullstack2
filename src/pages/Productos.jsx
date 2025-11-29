@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from "react";
-import { Container, Row, Col, Card, Button, Form, InputGroup, Badge, Alert } from "react-bootstrap";
+import React, { useMemo, useState, useEffect } from "react";
+import { Container, Row, Col, Card, Button, Form, InputGroup, Badge, Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { PRODUCTS } from "../data/products.js";
+import { productosService, categoriasService } from "../services/api.js";
 import { useCart } from "../contexts/CartContext.jsx";
 import { useToast } from "../contexts/ToastContext.jsx";
 
-const CATS = ["Todos","Rock","Jazz","Pop","Clásica"];
-
 export default function Productos(){
+  const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [cat, setCat] = useState("Todos");
   const [busqueda, setBusqueda] = useState("");
   const [precioMin, setPrecioMin] = useState("");
@@ -21,69 +22,127 @@ export default function Productos(){
   const toast = useToast();
   const navigate = useNavigate();
 
-  const productosFiltrados = useMemo(() => {
-    let productos = PRODUCTS;
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [productosData, categoriasData] = await Promise.all([
+          productosService.getAll(true), //solo productos activos
+          categoriasService.getAll()
+        ]);
+        setProductos(productosData);
+        setCategorias(categoriasData);
+      } catch (error) {
+        console.error('Error al cargar productos:', error);
+        toast.error('Error al cargar productos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [toast]);
 
-    //filtro por categoría
+  const productosFiltrados = useMemo(() => {
+    const getCategoriaNombre = (producto) => {
+      if (!producto || !Array.isArray(categorias) || categorias.length === 0) {
+        return producto?.categoria?.nombre || (producto?.categoria && typeof producto.categoria === 'string' ? producto.categoria : '') || '';
+      }
+      
+      //primero intentar obtener categoria_id
+      const categoriaId = producto.categoria_id || (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.id) || null;
+      
+      if (categoriaId) {
+        const categoriaIdNum = Number(categoriaId);
+        const encontrada = categorias.find((c) => Number(c.id) === categoriaIdNum);
+        if (encontrada && encontrada.nombre) {
+          return encontrada.nombre;
+        }
+      }
+      
+      //si no hay categoria_id, buscar por nombre de categoría (string)
+      const categoriaNombre = producto.categoria && typeof producto.categoria === 'string' 
+        ? producto.categoria 
+        : (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.nombre) 
+          ? producto.categoria.nombre 
+          : '';
+      
+      if (categoriaNombre) {
+        //buscar la categoría por nombre (case-insensitive)
+        const encontradaPorNombre = categorias.find((c) => 
+          c.nombre && c.nombre.toLowerCase() === categoriaNombre.toLowerCase()
+        );
+        
+        if (encontradaPorNombre && encontradaPorNombre.nombre) {
+          return encontradaPorNombre.nombre;
+        }
+        
+        //si no se encuentra, devolver el nombre original
+        return categoriaNombre;
+      }
+      
+      return '';
+    };
+
+    let productosFiltrados = [...productos];
+
     if (cat !== "Todos") {
-      const categoriaNormalizada = cat.toLowerCase();
-      productos = productos.filter(p => (p.genero || "").toLowerCase() === categoriaNormalizada);
+      productosFiltrados = productosFiltrados.filter((p) => getCategoriaNombre(p) === cat);
     }
 
-    //filtro por búsqueda
     if (busqueda.trim()) {
       const terminoBusqueda = busqueda.toLowerCase();
-      productos = productos.filter(p => 
-        p.nombre.toLowerCase().includes(terminoBusqueda) ||
-        p.artista.toLowerCase().includes(terminoBusqueda) ||
-        p.genero.toLowerCase().includes(terminoBusqueda)
+      productosFiltrados = productosFiltrados.filter(p => 
+        p.nombre?.toLowerCase().includes(terminoBusqueda) ||
+        p.artista?.toLowerCase().includes(terminoBusqueda) ||
+        getCategoriaNombre(p).toLowerCase().includes(terminoBusqueda)
       );
     }
 
-    //filtro por precio
     if (precioMin) {
-      productos = productos.filter(p => p.precio >= parseInt(precioMin));
+      productosFiltrados = productosFiltrados.filter(p => p.precio >= parseInt(precioMin));
     }
     if (precioMax) {
-      productos = productos.filter(p => p.precio <= parseInt(precioMax));
+      productosFiltrados = productosFiltrados.filter(p => p.precio <= parseInt(precioMax));
     }
 
-    //filtro por año
-    if (añoMin) {
-      productos = productos.filter(p => p.año >= parseInt(añoMin));
+    if (añoMin && productosFiltrados[0]?.año) {
+      productosFiltrados = productosFiltrados.filter(p => p.año >= parseInt(añoMin));
     }
-    if (añoMax) {
-      productos = productos.filter(p => p.año <= parseInt(añoMax));
+    if (añoMax && productosFiltrados[0]?.año) {
+      productosFiltrados = productosFiltrados.filter(p => p.año <= parseInt(añoMax));
     }
 
-    //ordenar productos
-    productos.sort((a, b) => {
+    productosFiltrados.sort((a, b) => {
       switch (ordenarPor) {
         case "precio-asc":
           return a.precio - b.precio;
         case "precio-desc":
           return b.precio - a.precio;
         case "año":
-          return b.año - a.año;
+          return (b.año || 0) - (a.año || 0);
         case "nombre":
         default:
-          return a.nombre.localeCompare(b.nombre);
+          return (a.nombre || '').localeCompare(b.nombre || '');
       }
     });
 
-    return productos;
-  }, [cat, busqueda, precioMin, precioMax, añoMin, añoMax, ordenarPor]);
+    return productosFiltrados;
+  }, [productos, categorias, cat, busqueda, precioMin, precioMax, añoMin, añoMax, ordenarPor]);
 
-  const onAdd = (p) => {
-    add({ 
-      id: p.id, 
-      nombre: p.nombre, 
-      precio: p.precio, 
-      imagen: p.imagen, 
-      artista: p.artista, 
-      qty: 1 
-    });
-    toast.success(`Se agregó "${p.nombre}" al carrito`);
+  const onAdd = async (p) => {
+    try {
+      await add({ 
+        id: p.id, 
+        nombre: p.nombre, 
+        precio: p.precio, 
+        imagen: p.imagen, 
+        artista: p.artista, 
+        qty: 1 
+      });
+      toast.success(`Se agregó "${p.nombre}" al carrito`);
+    } catch (error) {
+      toast.error('Error al agregar producto al carrito');
+    }
   };
 
   const limpiarFiltros = () => {
@@ -101,6 +160,18 @@ export default function Productos(){
       currency: 'CLP'
     }).format(precio);
   };
+
+  if (loading) {
+    return (
+      <Container className="py-5">
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Cargando productos...</span>
+          </Spinner>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-5">
@@ -168,14 +239,21 @@ export default function Productos(){
               <div className="mb-3">
                 <Form.Label>Categorías</Form.Label>
                 <div className="d-flex flex-wrap gap-2">
-                  {CATS.map(c => (
+                  <Button
+                    variant={cat === "Todos" ? "primary" : "outline-primary"}
+                    size="sm"
+                    onClick={() => setCat("Todos")}
+                  >
+                    Todos
+                  </Button>
+                  {categorias.map(c => (
                     <Button
-                      key={c}
-                      variant={cat === c ? "primary" : "outline-primary"}
+                      key={c.id}
+                      variant={cat === c.nombre ? "primary" : "outline-primary"}
                       size="sm"
-                      onClick={() => setCat(c)}
+                      onClick={() => setCat(c.nombre)}
                     >
-                      {c}
+                      {c.nombre}
                     </Button>
                   ))}
                 </div>
@@ -258,7 +336,46 @@ export default function Productos(){
         </Row>
       ) : (
         <Row>
-          {productosFiltrados.map((p) => (
+          {productosFiltrados.map((p) => {
+            const categoriaNombre = (() => {
+              if (!p || !Array.isArray(categorias) || categorias.length === 0) {
+                return p?.categoria?.nombre || (p?.categoria && typeof p.categoria === 'string' ? p.categoria : '') || '';
+              }
+              
+              //primero intentar obtener categoria_id
+              const categoriaId = p.categoria_id || (p.categoria && typeof p.categoria === 'object' && p.categoria.id) || null;
+              
+              if (categoriaId) {
+                const categoriaIdNum = Number(categoriaId);
+                const encontrada = categorias.find((c) => Number(c.id) === categoriaIdNum);
+                if (encontrada && encontrada.nombre) {
+                  return encontrada.nombre;
+                }
+              }
+              
+              //si no hay categoria_id, buscar por nombre de categoría (string)
+              const categoriaNombreStr = p.categoria && typeof p.categoria === 'string' 
+                ? p.categoria 
+                : (p.categoria && typeof p.categoria === 'object' && p.categoria.nombre) 
+                  ? p.categoria.nombre 
+                  : '';
+              
+              if (categoriaNombreStr) {
+                const encontradaPorNombre = categorias.find((c) => 
+                  c.nombre && c.nombre.toLowerCase() === categoriaNombreStr.toLowerCase()
+                );
+                
+                if (encontradaPorNombre && encontradaPorNombre.nombre) {
+                  return encontradaPorNombre.nombre;
+                }
+                
+                return categoriaNombreStr;
+              }
+              
+              return '';
+            })();
+
+            return (
             <Col key={p.id} md={6} lg={4} className="mb-4">
               <Card className="h-100 shadow-sm">
                 <div className="position-relative">
@@ -268,17 +385,19 @@ export default function Productos(){
                     alt={p.nombre}
                     style={{ height: '250px', objectFit: 'cover' }}
                   />
-                  <Badge 
-                    bg="secondary" 
-                    className="position-absolute top-0 end-0 m-2"
-                  >
-                    {p.genero}
-                  </Badge>
+                  {categoriaNombre && (
+                    <Badge 
+                      bg="secondary" 
+                      className="position-absolute top-0 end-0 m-2"
+                    >
+                      {categoriaNombre}
+                    </Badge>
+                  )}
                 </div>
                 <Card.Body className="d-flex flex-column">
                   <Card.Title className="h6">{p.nombre}</Card.Title>
                   <Card.Text className="text-muted">
-                    {p.artista} • {p.año}
+                    {p.artista} {p.año && `• ${p.año}`}
                   </Card.Text>
                   <Card.Text className="fw-bold text-primary mb-3">
                     {formatearPrecio(p.precio)}
@@ -306,7 +425,7 @@ export default function Productos(){
                 </Card.Body>
               </Card>
             </Col>
-          ))}
+          )})}
         </Row>
       )}
     </Container>

@@ -5,6 +5,7 @@ import Footer from './components/Footer.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
 import { ToastProvider } from './contexts/ToastContext.jsx';
+import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 
 import Home from './pages/Home.jsx';
 import Productos from './pages/Productos.jsx';
@@ -159,54 +160,74 @@ export default function App() {
             } />
             <Route path='/boletas' element={
               <AdminShell>
-                <Boletas />
+                <ProtectedRoute>
+                  <Boletas />
+                </ProtectedRoute>
               </AdminShell>
             } />
             
-            {/* Rutas de admin sin Navbar y Footer */}
+            {/* Rutas de admin sin Navbar y Footer - protegidas con autenticación y rol admin */}
             <Route path='/admin' element={
               <AdminShell>
-                <Dashboard />
+                <ProtectedRoute requireAdmin={true}>
+                  <Dashboard />
+                </ProtectedRoute>
               </AdminShell>
             } />
             <Route path='/admin/inventory' element={
               <AdminShell>
-                <Inventory />
+                <ProtectedRoute requireAdmin={true}>
+                  <Inventory />
+                </ProtectedRoute>
               </AdminShell>
             } />
             <Route path='/admin/users' element={
               <AdminShell>
-                <Users />
+                <ProtectedRoute requireAdmin={true}>
+                  <Users />
+                </ProtectedRoute>
               </AdminShell>
             } />
             <Route path='/admin/products/new' element={
               <AdminShell>
-                <NewProduct />
+                <ProtectedRoute requireAdmin={true}>
+                  <NewProduct />
+                </ProtectedRoute>
               </AdminShell>
             } />
             <Route path='/admin/products/edit/:id' element={
               <AdminShell>
-                <EditProduct />
+                <ProtectedRoute requireAdmin={true}>
+                  <EditProduct />
+                </ProtectedRoute>
               </AdminShell>
             } />
             <Route path='/admin/users/new' element={
               <AdminShell>
-                <NewUser />
+                <ProtectedRoute requireAdmin={true}>
+                  <NewUser />
+                </ProtectedRoute>
               </AdminShell>
             } />
             <Route path='/admin/users/edit/:id' element={
               <AdminShell>
-                <EditUser />
+                <ProtectedRoute requireAdmin={true}>
+                  <EditUser />
+                </ProtectedRoute>
               </AdminShell>
             } />
             <Route path='/admin/reportes' element={
               <AdminShell>
-                <Reportes />
+                <ProtectedRoute requireAdmin={true}>
+                  <Reportes />
+                </ProtectedRoute>
               </AdminShell>
             } />
             <Route path='/admin/perfil' element={
               <AdminShell>
-                <Perfil />
+                <ProtectedRoute>
+                  <Perfil />
+                </ProtectedRoute>
               </AdminShell>
             } />
             

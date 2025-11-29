@@ -2,19 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminPageLayout from '../../components/AdminLayout';
 import { regionesComunas } from '../../data/regiones-comunas';
+import { usuariosService } from '../../services/api.js';
 
 const NewUser = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    run: '',
-    firstName: '',
-    lastName: '',
+    nombre: '',
+    apellido: '',
     email: '',
-    fechaNacimiento: '',
-    tipoUsuario: '',
+    password: '',
+    telefono: '',
+    direccion: '',
     region: '',
     comuna: '',
-    direccion: '',
+    rol: '',
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -34,27 +35,29 @@ const NewUser = () => {
   const validateField = (name, value) => {
     let error = '';
     switch (name) {
-      case 'run':
-        if (!value.trim()) error = 'El RUN es obligatorio';
-        else if (!/^\d{7,8}[-][0-9Kk]$/.test(value)) error = 'Formato de RUN inválido (ej: 12345678-K)';
-        break;
-      case 'firstName':
+      case 'nombre':
         if (!value.trim()) error = 'El nombre es obligatorio';
         else if (value.length > 50) error = 'El nombre no puede exceder 50 caracteres';
         break;
-      case 'lastName':
-        if (!value.trim()) error = 'Los apellidos son obligatorios';
-        else if (value.length > 100) error = 'Los apellidos no pueden exceder 100 caracteres';
+      case 'apellido':
+        if (!value.trim()) error = 'El apellido es obligatorio';
+        else if (value.length > 100) error = 'El apellido no puede exceder 100 caracteres';
         break;
       case 'email':
         if (!value.trim()) error = 'El correo es obligatorio';
         else if (!/\S+@\S+\.\S+/.test(value)) error = 'Formato de correo inválido';
         else if (value.length > 100) error = 'El correo no puede exceder 100 caracteres';
         break;
-      case 'fechaNacimiento':
+      case 'password':
+        if (!value.trim()) error = 'La contraseña es obligatoria';
+        else if (value.length < 6) error = 'La contraseña debe tener al menos 6 caracteres';
         break;
-      case 'tipoUsuario':
-        if (!value) error = 'El tipo de usuario es obligatorio';
+      case 'telefono':
+        if (!value.trim()) error = 'El teléfono es obligatorio';
+        break;
+      case 'direccion':
+        if (!value.trim()) error = 'La dirección es obligatoria';
+        else if (value.length > 300) error = 'La dirección no puede exceder 300 caracteres';
         break;
       case 'region':
         if (!value) error = 'La región es obligatoria';
@@ -62,9 +65,8 @@ const NewUser = () => {
       case 'comuna':
         if (!value) error = 'La comuna es obligatoria';
         break;
-      case 'direccion':
-        if (!value.trim()) error = 'La dirección es obligatoria';
-        else if (value.length > 300) error = 'La dirección no puede exceder 300 caracteres';
+      case 'rol':
+        if (!value) error = 'El rol es obligatorio';
         break;
       default:
         break;
@@ -97,20 +99,30 @@ const NewUser = () => {
       setMessage('');
       setMessageType('');
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log('Usuario a crear:', formData);
-        setMessage(`¡Usuario "${formData.firstName} ${formData.lastName}" creado exitosamente!`);
+        const payload = {
+          nombre: formData.nombre,
+          apellido: formData.apellido,
+          email: formData.email,
+          password: formData.password,
+          telefono: formData.telefono,
+          direccion: formData.direccion,
+          region: formData.region,
+          comuna: formData.comuna,
+          rol: formData.rol,
+        };
+        await usuariosService.create(payload);
+        setMessage(`¡Usuario "${formData.nombre} ${formData.apellido}" creado exitosamente!`);
         setMessageType('success');
         setFormData({
-          run: '',
-          firstName: '',
-          lastName: '',
+          nombre: '',
+          apellido: '',
           email: '',
-          fechaNacimiento: '',
-          tipoUsuario: '',
+          password: '',
+          telefono: '',
+          direccion: '',
           region: '',
           comuna: '',
-          direccion: '',
+          rol: '',
         });
         setErrors({});
         setTimeout(() => navigate('/admin/users'), 1500);
@@ -145,48 +157,32 @@ const NewUser = () => {
         <div className="form-container-admin">
           <form id="newUserForm" className="admin-form" onSubmit={handleSubmit} noValidate>
             <div className="form-grid">
-              <div className={`form-group ${errors.run ? 'error' : ''}`}>
-                <label htmlFor="run">RUN *</label>
+              <div className={`form-group ${errors.nombre ? 'error' : ''}`}>
+                <label htmlFor="nombre">Nombre *</label>
                 <input
                   type="text"
-                  id="run"
-                  name="run"
-                  value={formData.run}
-                  onChange={handleChange}
-                  required
-                  minLength="7"
-                  maxLength="9"
-                  placeholder="Ej: 19011022K"
-                />
-                <span className="error-message">{errors.run}</span>
-              </div>
-
-              <div className={`form-group ${errors.firstName ? 'error' : ''}`}>
-                <label htmlFor="firstName">Nombre *</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
+                  id="nombre"
+                  name="nombre"
+                  value={formData.nombre}
                   onChange={handleChange}
                   required
                   maxLength="50"
                 />
-                <span className="error-message">{errors.firstName}</span>
+                <span className="error-message">{errors.nombre}</span>
               </div>
 
-              <div className={`form-group ${errors.lastName ? 'error' : ''}`}>
-                <label htmlFor="lastName">Apellidos *</label>
+              <div className={`form-group ${errors.apellido ? 'error' : ''}`}>
+                <label htmlFor="apellido">Apellido *</label>
                 <input
                   type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
+                  id="apellido"
+                  name="apellido"
+                  value={formData.apellido}
                   onChange={handleChange}
                   required
                   maxLength="100"
                 />
-                <span className="error-message">{errors.lastName}</span>
+                <span className="error-message">{errors.apellido}</span>
               </div>
 
               <div className={`form-group ${errors.email ? 'error' : ''}`}>
@@ -203,27 +199,31 @@ const NewUser = () => {
                 <span className="error-message">{errors.email}</span>
               </div>
 
-              <div className={`form-group ${errors.fechaNacimiento ? 'error' : ''}`}>
-                <label htmlFor="fechaNacimiento">Fecha de Nacimiento</label>
+              <div className={`form-group ${errors.password ? 'error' : ''}`}>
+                <label htmlFor="password">Contraseña *</label>
                 <input
-                  type="date"
-                  id="fechaNacimiento"
-                  name="fechaNacimiento"
-                  value={formData.fechaNacimiento}
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
                   onChange={handleChange}
+                  required
+                  minLength="6"
                 />
-                <span className="error-message">{errors.fechaNacimiento}</span>
+                <span className="error-message">{errors.password}</span>
               </div>
 
-              <div className={`form-group ${errors.tipoUsuario ? 'error' : ''}`}>
-                <label htmlFor="tipoUsuario">Tipo de Usuario *</label>
-                <select id="tipoUsuario" name="tipoUsuario" value={formData.tipoUsuario} onChange={handleChange} required>
-                  <option value="">Seleccionar tipo</option>
-                  <option value="Administrador">Administrador</option>
-                  <option value="Cliente">Cliente</option>
-                  <option value="Vendedor">Vendedor</option>
-                </select>
-                <span className="error-message">{errors.tipoUsuario}</span>
+              <div className={`form-group ${errors.telefono ? 'error' : ''}`}>
+                <label htmlFor="telefono">Teléfono *</label>
+                <input
+                  type="text"
+                  id="telefono"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  required
+                />
+                <span className="error-message">{errors.telefono}</span>
               </div>
 
               <div className={`form-group ${errors.region ? 'error' : ''}`}>
@@ -265,6 +265,16 @@ const NewUser = () => {
                   onChange={handleChange}
                 ></textarea>
                 <span className="error-message">{errors.direccion}</span>
+              </div>
+
+              <div className={`form-group ${errors.rol ? 'error' : ''}`}>
+                <label htmlFor="rol">Rol *</label>
+                <select id="rol" name="rol" value={formData.rol} onChange={handleChange} required>
+                  <option value="">Seleccionar rol</option>
+                  <option value="Administrador">Administrador</option>
+                  <option value="Usuario">Usuario</option>
+                </select>
+                <span className="error-message">{errors.rol}</span>
               </div>
             </div>
 

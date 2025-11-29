@@ -122,3 +122,5 @@ export const useSearchParams = () => [mockSearchParams, jest.fn()];
 
 //mock para useRouteMatch hook
 export const useRouteMatch = () => mockRouteMatch;
+
+

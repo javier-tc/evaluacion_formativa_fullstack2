@@ -1,13 +1,96 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { PRODUCTS } from "../data/products.js";      
-import { useCart } from "../contexts/CartContext.jsx"; 
+import { productosService, categoriasService } from "../services/api.js";      
+import { useCart } from "../contexts/CartContext.jsx";
+import { useToast } from "../contexts/ToastContext.jsx";
+import { Spinner } from "react-bootstrap";
 
 export default function DetalleProducto() {
   const { id } = useParams();
-  const product = PRODUCTS.find((p) => String(p.id) === String(id));
+  const [product, setProduct] = useState(null);
+  const [relacionados, setRelacionados] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { add } = useCart();
+  const toast = useToast();
   const [qty, setQty] = useState(1);
+
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const [productData, categoriasData] = await Promise.all([
+          productosService.getById(id),
+          categoriasService.getAll()
+        ]);
+        setProduct(productData);
+        setCategorias(categoriasData);
+        
+        //cargar productos relacionados de la misma categoría
+        if (productData.categoria_id) {
+          const relacionadosData = await productosService.getByCategoria(productData.categoria_id);
+          setRelacionados(relacionadosData.filter(p => p.id !== productData.id).slice(0, 3));
+        }
+      } catch (error) {
+        console.error('Error al cargar producto:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProduct();
+  }, [id]);
+
+  const getCategoriaNombre = (producto) => {
+    if (!producto || !Array.isArray(categorias) || categorias.length === 0) {
+      return producto?.categoria?.nombre || (producto?.categoria && typeof producto.categoria === 'string' ? producto.categoria : '') || producto?.genero || '';
+    }
+    
+    //si categoria es un objeto con nombre
+    if (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.nombre) {
+      return producto.categoria.nombre;
+    }
+    
+    //primero intentar obtener categoria_id
+    const categoriaId = producto.categoria_id || (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.id) || null;
+    
+    if (categoriaId) {
+      const categoriaIdNum = Number(categoriaId);
+      const encontrada = categorias.find((c) => Number(c.id) === categoriaIdNum);
+      if (encontrada && encontrada.nombre) {
+        return encontrada.nombre;
+      }
+    }
+    
+    //si no hay categoria_id, buscar por nombre de categoría (string)
+    const categoriaNombre = producto.categoria && typeof producto.categoria === 'string' 
+      ? producto.categoria 
+      : '';
+    
+    if (categoriaNombre) {
+      const encontradaPorNombre = categorias.find((c) => 
+        c.nombre && c.nombre.toLowerCase() === categoriaNombre.toLowerCase()
+      );
+      
+      if (encontradaPorNombre && encontradaPorNombre.nombre) {
+        return encontradaPorNombre.nombre;
+      }
+      
+      return categoriaNombre;
+    }
+    
+    return producto.genero || '';
+  };
+
+  if (loading) {
+    return (
+      <div className="section-base">
+        <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Cargando producto...</span>
+          </Spinner>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -17,19 +100,20 @@ export default function DetalleProducto() {
     );
   }
 
-  const relacionados = PRODUCTS
-    .filter((p) => p.id !== product.id)
-    .slice(0, 3);
-
-  const handleAdd = () => {
-    add({
-      id: product.id,
-      nombre: product.nombre,
-      precio: product.precio,
-      imagen: product.imagen,
-      artista: product.artista,
-      qty,
-    });
+  const handleAdd = async () => {
+    try {
+      await add({
+        id: product.id,
+        nombre: product.nombre,
+        precio: product.precio,
+        imagen: product.imagen,
+        artista: product.artista,
+        qty,
+      });
+      toast.success(`Se agregó "${product.nombre}" al carrito`);
+    } catch (error) {
+      toast.error('Error al agregar producto al carrito');
+    }
   };
 
   return (
@@ -47,7 +131,7 @@ export default function DetalleProducto() {
             <div className="card padded-lg">
               <h1 className="detail-title">{product.nombre}</h1>
               <div className="detail-meta">
-                {product.artista} · {product.genero} · {product.año}
+                {product.artista} {getCategoriaNombre(product) && `· ${getCategoriaNombre(product)}`} {product.año && `· ${product.año}`}
               </div>
 
               <div>
@@ -57,7 +141,7 @@ export default function DetalleProducto() {
 
               <h3 style={{marginTop:"1.25rem"}}>Descripción</h3>
               <p>
-                {product.descripcion ??
+                {product.descripcion ||
                   "El segundo y último álbum de estudio de Amy Winehouse, ganador de múltiples premios Grammy."}
               </p>
 
@@ -65,15 +149,15 @@ export default function DetalleProducto() {
               <div className="specs">
                 <div className="row">
                   <span className="label">Categoría:</span>
-                  <span>{product.genero?.toLowerCase() || "—"}</span>
+                  <span>{getCategoriaNombre(product) || "—"}</span>
                 </div>
                 <div className="row">
-                  <span className="label">Stock Crítico:</span>
-                  <span>{product.stockCritico ?? 3} unidades</span>
+                  <span className="label">Stock:</span>
+                  <span>{product.stock ?? 8} unidades</span>
                 </div>
                 <div className="row">
                   <span className="label">Estado:</span>
-                  <span>Disponible</span>
+                  <span>{product.activo ? 'Disponible' : 'No disponible'}</span>
                 </div>
               </div>
 
@@ -111,12 +195,19 @@ export default function DetalleProducto() {
                   </div>
                   <h3 style={{marginTop:"1rem"}}>{p.nombre}</h3>
                   <p className="text-muted">{p.artista}</p>
-                  <p className="text-muted">{p.genero} · {p.año}</p>
+                  <p className="text-muted">{getCategoriaNombre(p)} {p.año && `· ${p.año}`}</p>
                   <p className="price" style={{color:"#e74c3c", fontWeight:800}}>${p.precio.toLocaleString()}</p>
 
                   <button
                     className="btn-base btn-orange"
-                    onClick={() => add({ id:p.id, nombre:p.nombre, precio:p.precio, imagen:p.imagen, artista:p.artista })}
+                    onClick={async () => {
+                      try {
+                        await add({ id:p.id, nombre:p.nombre, precio:p.precio, imagen:p.imagen, artista:p.artista });
+                        toast.success(`Se agregó "${p.nombre}" al carrito`);
+                      } catch (error) {
+                        toast.error('Error al agregar producto al carrito');
+                      }
+                    }}
                   >
                     Agregar al Carrito
                   </button>

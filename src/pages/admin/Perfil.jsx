@@ -1,25 +1,65 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminPageLayout from '../../components/AdminLayout';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 
 const Perfil = () => {
+  const { user, updateProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('perfil');
   const [isEditing, setIsEditing] = useState(false);
-  
-  //datos simulados del administrador
   const [adminData, setAdminData] = useState({
-    id: 1,
-    name: 'Carlos Ruiz',
-    username: '@carlosruiz',
-    email: 'carlos.ruiz@duocuc.cl',
-    role: 'admin',
-    phone: '+56 9 1234 5678',
-    address: 'Av. Providencia 1234, Santiago',
-    registrationDate: '10/01/2025',
-    lastLogin: '25/01/2025 14:30',
+    id: null,
+    name: '',
+    username: '',
+    email: '',
+    role: '',
+    phone: '',
+    address: '',
+    registrationDate: '',
+    lastLogin: '',
     avatar: null
   });
-
   const [formData, setFormData] = useState({ ...adminData });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      const nombreCompleto = `${user.nombre || ''} ${user.apellidos || ''}`.trim() || user.name || '';
+      const username =
+        user.username ||
+        (user.email ? `@${user.email.split('@')[0]}` : '');
+      const role = user.rol || user.role || 'admin';
+      const addressParts = [];
+      if (user.direccion) {
+        if (user.direccion.calle) addressParts.push(user.direccion.calle);
+        if (user.direccion.comuna) addressParts.push(user.direccion.comuna);
+        if (user.direccion.region) addressParts.push(user.direccion.region);
+      }
+      const address = addressParts.join(', ');
+      const registrationDate =
+        user.fechaRegistro ||
+        (user.createdAt && new Date(user.createdAt).toLocaleDateString('es-CL')) ||
+        '';
+      const lastLogin =
+        user.ultimoLogin ||
+        user.lastLogin ||
+        '';
+
+      const mapped = {
+        id: user.id,
+        name: nombreCompleto,
+        username,
+        email: user.email || '',
+        role,
+        phone: user.telefono || '',
+        address,
+        registrationDate,
+        lastLogin,
+        avatar: user.avatar || null
+      };
+      setAdminData(mapped);
+      setFormData(mapped);
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,10 +69,69 @@ const Perfil = () => {
     }));
   };
 
-  const handleSaveProfile = () => {
-    setAdminData(formData);
-    setIsEditing(false);
-    console.log('Perfil actualizado:', formData);
+  const handleSaveProfile = async () => {
+    if (!adminData.id) {
+      return;
+    }
+    setSaving(true);
+    try {
+      const payload = {
+        nombre: formData.name,
+        email: formData.email,
+        telefono: formData.phone,
+        direccion: {
+          calle: formData.address,
+          region: user?.direccion?.region || '',
+          comuna: user?.direccion?.comuna || ''
+        }
+      };
+      const result = await updateProfile(adminData.id, payload);
+      if (result?.success && result.user) {
+        const updatedUser = result.user;
+        const nombreCompleto = `${updatedUser.nombre || ''} ${updatedUser.apellidos || ''}`.trim() || updatedUser.name || '';
+        const username =
+          updatedUser.username ||
+          (updatedUser.email ? `@${updatedUser.email.split('@')[0]}` : '');
+        const role = updatedUser.rol || updatedUser.role || 'admin';
+        const addressParts = [];
+        if (updatedUser.direccion) {
+          if (updatedUser.direccion.calle) addressParts.push(updatedUser.direccion.calle);
+          if (updatedUser.direccion.comuna) addressParts.push(updatedUser.direccion.comuna);
+          if (updatedUser.direccion.region) addressParts.push(updatedUser.direccion.region);
+        }
+        const address = addressParts.join(', ');
+        const registrationDate =
+          updatedUser.fechaRegistro ||
+          (updatedUser.createdAt && new Date(updatedUser.createdAt).toLocaleDateString('es-CL')) ||
+          '';
+        const lastLogin =
+          updatedUser.ultimoLogin ||
+          updatedUser.lastLogin ||
+          '';
+
+        const mapped = {
+          id: updatedUser.id,
+          name: nombreCompleto,
+          username,
+          email: updatedUser.email || '',
+          role,
+          phone: updatedUser.telefono || '',
+          address,
+          registrationDate,
+          lastLogin,
+          avatar: updatedUser.avatar || null
+        };
+        setAdminData(mapped);
+        setFormData(mapped);
+      } else {
+        console.error('Error al actualizar perfil:', result?.error);
+      }
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error al actualizar perfil:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -70,7 +169,7 @@ const Perfil = () => {
         </div>
         <div className="profile-info">
           <h2>{adminData.name}</h2>
-          <p className="profile-role">{adminData.role.charAt(0).toUpperCase() + adminData.role.slice(1)}</p>
+          <p className="profile-role">{adminData.role ? adminData.role.charAt(0).toUpperCase() + adminData.role.slice(1) : ''}</p>
           <p className="profile-username">{adminData.username}</p>
         </div>
       </div>
@@ -139,7 +238,7 @@ const Perfil = () => {
               <label>Rol</label>
               <input 
                 type="text" 
-                value={formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}
+                value={formData.role ? formData.role.charAt(0).toUpperCase() + formData.role.slice(1) : ''}
                 disabled
               />
             </div>
@@ -176,9 +275,10 @@ const Perfil = () => {
               <button 
                 className="btn-base btn-success"
                 onClick={handleSaveProfile}
+                disabled={saving}
               >
                 <i className="fas fa-save"></i>
-                Guardar Cambios
+                {saving ? 'Guardando...' : 'Guardar Cambios'}
               </button>
               <button 
                 className="btn-base btn-secondary"

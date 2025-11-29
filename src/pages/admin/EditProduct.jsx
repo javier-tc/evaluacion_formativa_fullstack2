@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AdminPageLayout from '../../components/AdminLayout';
+import { productosService, categoriasService } from '../../services/api.js';
+import { useToast } from '../../contexts/ToastContext.jsx';
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -8,6 +10,7 @@ const EditProduct = () => {
   const [formData, setFormData] = useState({
     codigoProducto: '',
     productName: '',
+    artist: '',
     description: '',
     price: '',
     stock: '',
@@ -20,25 +23,51 @@ const EditProduct = () => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
+  const [categorias, setCategorias] = useState([]);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [creatingCategory, setCreatingCategory] = useState(false);
+  const [newCategoryError, setNewCategoryError] = useState('');
+  const toast = useToast();
 
   useEffect(() => {
-    // Simulate fetching product data
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const dummyProduct = {
-          codigoProducto: `PROD-${id}`,
-          productName: `Producto de Ejemplo ${id}`,
-          description: `Esta es una descripción para el producto ${id}.`,
-          price: 29.99,
-          stock: 15,
-          stockCritico: 5,
-          category: 'rock',
-          imageUrl: 'https://via.placeholder.com/300x300?text=Producto+Existente',
-        };
-        setFormData(dummyProduct);
+        const [producto, categoriasData] = await Promise.all([
+          productosService.getById(id),
+          categoriasService.getAll()
+        ]);
+        setCategorias(categoriasData);
+        
+        //obtener categoria_id: primero buscar por ID, luego por nombre de categoría
+        let categoriaId = producto.categoria_id || (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.id) || null;
+        
+        //si no hay categoria_id pero hay categoria como string, buscar por nombre
+        if (!categoriaId && producto.categoria && typeof producto.categoria === 'string') {
+          const categoriaEncontrada = categoriasData.find((c) => 
+            c.nombre && c.nombre.toLowerCase() === producto.categoria.toLowerCase()
+          );
+          if (categoriaEncontrada) {
+            categoriaId = categoriaEncontrada.id;
+          }
+        }
+        
+        const categoryValue = categoriaId ? String(categoriaId) : '';
+        
+        setFormData({
+          codigoProducto: `PROD-${producto.id}`,
+          productName: producto.nombre,
+          artist: producto.artista || '',
+          description: producto.descripcion || '',
+          price: producto.precio,
+          stock: producto.stock,
+          stockCritico: producto.stockCritico || 5,
+          category: categoryValue,
+          imageUrl: producto.imagen || '',
+        });
       } catch (error) {
+        console.error('Error al cargar producto:', error);
+        toast.error('Error al cargar el producto');
         setMessage('Error al cargar el producto.');
         setMessageType('error');
       } finally {
@@ -48,7 +77,36 @@ const EditProduct = () => {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, toast]);
+
+  const handleCreateCategory = async () => {
+    const nombre = newCategoryName.trim();
+    if (!nombre) {
+      setNewCategoryError('El nombre de la categoría es obligatorio');
+      return;
+    }
+    setNewCategoryError('');
+    setCreatingCategory(true);
+    try {
+      const nuevaCategoria = await categoriasService.create({ nombre });
+      const categoriaId = nuevaCategoria.id || nuevaCategoria.categoria_id;
+      setCategorias((prev) => [...prev, nuevaCategoria]);
+      if (categoriaId) {
+        setFormData((prev) => ({
+          ...prev,
+          category: String(categoriaId)
+        }));
+      }
+      setNewCategoryName('');
+      toast.success('Categoría creada exitosamente');
+    } catch (error) {
+      console.error('Error al crear categoría:', error);
+      toast.error('Error al crear la categoría');
+      setNewCategoryError('No se pudo crear la categoría. Intenta nuevamente.');
+    } finally {
+      setCreatingCategory(false);
+    }
+  };
 
   const validateField = (name, value) => {
     let error = '';
@@ -60,6 +118,10 @@ const EditProduct = () => {
       case 'productName':
         if (!value.trim()) error = 'El nombre es obligatorio';
         else if (value.length > 100) error = 'El nombre no puede exceder 100 caracteres';
+        break;
+      case 'artist':
+        if (!value.trim()) error = 'El artista es obligatorio';
+        else if (value.length > 100) error = 'El artista no puede exceder 100 caracteres';
         break;
       case 'description':
         if (value.length > 500) error = 'La descripción no puede exceder 500 caracteres';
@@ -130,12 +192,25 @@ const EditProduct = () => {
       setMessage('');
       setMessageType('');
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log('Producto a actualizar:', formData);
+        const productoData = {
+          nombre: formData.productName,
+          artista: formData.artist,
+          precio: parseFloat(formData.price),
+          categoria_id: parseInt(formData.category, 10),
+          stock: parseInt(formData.stock, 10),
+          descripcion: formData.description || '',
+          imagen: formData.imageUrl || '',
+          activo: true
+        };
+        
+        await productosService.update(id, productoData);
+        toast.success(`¡Producto "${formData.productName}" actualizado exitosamente!`);
         setMessage(`¡Producto "${formData.productName}" actualizado exitosamente!`);
         setMessageType('success');
         setTimeout(() => navigate('/admin/inventory'), 1500);
       } catch (error) {
+        console.error('Error al actualizar producto:', error);
+        toast.error('Error al actualizar el producto');
         setMessage('Error al actualizar el producto.');
         setMessageType('error');
       } finally {
@@ -204,6 +279,20 @@ const EditProduct = () => {
               <span className="error-message">{errors.productName}</span>
             </div>
 
+            <div className={`form-group ${errors.artist ? 'error' : ''}`}>
+              <label htmlFor="artist">Artista *</label>
+              <input
+                type="text"
+                id="artist"
+                name="artist"
+                value={formData.artist}
+                onChange={handleChange}
+                required
+                maxLength="100"
+              />
+              <span className="error-message">{errors.artist}</span>
+            </div>
+
             <div className={`form-group ${errors.description ? 'error' : ''}`}>
               <label htmlFor="description">Descripción</label>
               <textarea
@@ -261,19 +350,42 @@ const EditProduct = () => {
             </div>
 
             <div className={`form-group ${errors.category ? 'error' : ''}`}>
-              <label htmlFor="category">Categorías *</label>
-              <select id="category" name="category" value={formData.category} onChange={handleChange} required>
+              <label htmlFor="category">Categoría *</label>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+              >
                 <option value="">Seleccionar categoría</option>
-                <option value="rock">Rock</option>
-                <option value="jazz">Jazz</option>
-                <option value="pop">Pop</option>
-                <option value="clasica">Clásica</option>
-                <option value="electronic">Electrónica</option>
-                <option value="folk">Folk</option>
-                <option value="blues">Blues</option>
-                <option value="reggae">Reggae</option>
+                {Array.isArray(categorias) && categorias.map((cat) => (
+                  <option key={cat.id} value={String(cat.id)}>
+                    {cat.nombre}
+                  </option>
+                ))}
               </select>
               <span className="error-message">{errors.category}</span>
+              <div className="new-category-inline">
+                <input
+                  type="text"
+                  placeholder="Nueva categoría"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="btn-base btn-secondary"
+                  onClick={handleCreateCategory}
+                  disabled={creatingCategory}
+                >
+                  {creatingCategory ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-plus"></i>}
+                  {creatingCategory ? 'Creando...' : 'Añadir'}
+                </button>
+              </div>
+              {newCategoryError && (
+                <span className="error-message">{newCategoryError}</span>
+              )}
             </div>
 
             <div className={`form-group ${errors.imageUrl ? 'error' : ''}`}>
