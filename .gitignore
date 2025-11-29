@@ -3,6 +3,10 @@ old_version/
 node_modules/
 node_modules/*
 node_modules
+node_modules
+/node_modules
+/node_modules/*
+/node_modules/
 .env
 TESTING_README.md
 USUARIOS_SISTEMA.md
