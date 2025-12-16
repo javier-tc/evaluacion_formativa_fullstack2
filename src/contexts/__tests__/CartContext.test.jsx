@@ -1,6 +1,19 @@
 import React from 'react';
 import { render, act, screen, fireEvent } from '@testing-library/react';
 import { CartProvider, useCart } from '../../contexts/CartContext';
+import { AuthProvider } from '../../contexts/AuthContext';
+import { vi } from 'vitest';
+
+//mock del servicio de API
+vi.mock('../../services/api.js', () => ({
+  carritoService: {
+    getCarrito: vi.fn().mockResolvedValue({ items: [] }),
+    addItem: vi.fn().mockResolvedValue({}),
+    removeItem: vi.fn().mockResolvedValue({}),
+    clearCarrito: vi.fn().mockResolvedValue({}),
+    updateItem: vi.fn().mockResolvedValue({})
+  }
+}));
 
 //componente de prueba para acceder al contexto
 const TestComponent = () => {
@@ -33,28 +46,45 @@ const TestComponent = () => {
   );
 };
 
-describe('CartContext', () => {
-  test('debe inicializar con carrito vacío', () => {
-    render(
+//wrapper con providers necesarios
+const renderWithProviders = (component) => {
+  return render(
+    <AuthProvider>
       <CartProvider>
-        <TestComponent />
+        {component}
       </CartProvider>
-    );
+    </AuthProvider>
+  );
+};
+
+describe('CartContext', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.clearAllMocks();
+  });
+
+  test('debe inicializar con carrito vacío', async () => {
+    renderWithProviders(<TestComponent />);
+
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
 
     expect(screen.getByTestId('total-items')).toHaveTextContent('0');
     expect(screen.getByTestId('total-price')).toHaveTextContent('0');
     expect(screen.getByTestId('items-count')).toHaveTextContent('0');
   });
 
-  test('debe agregar items al carrito correctamente', () => {
-    render(
-      <CartProvider>
-        <TestComponent />
-      </CartProvider>
-    );
+  test('debe agregar items al carrito correctamente', async () => {
+    renderWithProviders(<TestComponent />);
 
-    act(() => {
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
+    await act(async () => {
       fireEvent.click(screen.getByTestId('add-btn'));
+      await new Promise(resolve => setTimeout(resolve, 50));
     });
 
     expect(screen.getByTestId('total-items')).toHaveTextContent('1');
@@ -62,39 +92,40 @@ describe('CartContext', () => {
     expect(screen.getByTestId('items-count')).toHaveTextContent('1');
   });
 
-  test('debe incrementar cantidad cuando se agrega el mismo item', () => {
-    render(
-      <CartProvider>
-        <TestComponent />
-      </CartProvider>
-    );
+  test('debe incrementar cantidad cuando se agrega el mismo item', async () => {
+    renderWithProviders(<TestComponent />);
 
-    //agregar el mismo item dos veces
-    act(() => {
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
+    await act(async () => {
       fireEvent.click(screen.getByTestId('add-btn'));
+      await new Promise(resolve => setTimeout(resolve, 50));
       fireEvent.click(screen.getByTestId('add-btn'));
+      await new Promise(resolve => setTimeout(resolve, 50));
     });
 
     expect(screen.getByTestId('total-items')).toHaveTextContent('2');
     expect(screen.getByTestId('total-price')).toHaveTextContent('200');
-    expect(screen.getByTestId('items-count')).toHaveTextContent('1'); //solo un item único
+    expect(screen.getByTestId('items-count')).toHaveTextContent('1');
   });
 
-  test('debe remover items del carrito correctamente', () => {
-    render(
-      <CartProvider>
-        <TestComponent />
-      </CartProvider>
-    );
+  test('debe remover items del carrito correctamente', async () => {
+    renderWithProviders(<TestComponent />);
 
-    //agregar item primero
-    act(() => {
-      fireEvent.click(screen.getByTestId('add-btn'));
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
     });
 
-    //luego removerlo
-    act(() => {
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('add-btn'));
+      await new Promise(resolve => setTimeout(resolve, 50));
+    });
+
+    await act(async () => {
       fireEvent.click(screen.getByTestId('remove-btn'));
+      await new Promise(resolve => setTimeout(resolve, 50));
     });
 
     expect(screen.getByTestId('total-items')).toHaveTextContent('0');
@@ -102,22 +133,23 @@ describe('CartContext', () => {
     expect(screen.getByTestId('items-count')).toHaveTextContent('0');
   });
 
-  test('debe limpiar todo el carrito correctamente', () => {
-    render(
-      <CartProvider>
-        <TestComponent />
-      </CartProvider>
-    );
+  test('debe limpiar todo el carrito correctamente', async () => {
+    renderWithProviders(<TestComponent />);
 
-    //agregar varios items
-    act(() => {
-      fireEvent.click(screen.getByTestId('add-btn'));
-      fireEvent.click(screen.getByTestId('add-btn'));
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
     });
 
-    //limpiar carrito
-    act(() => {
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('add-btn'));
+      await new Promise(resolve => setTimeout(resolve, 50));
+      fireEvent.click(screen.getByTestId('add-btn'));
+      await new Promise(resolve => setTimeout(resolve, 50));
+    });
+
+    await act(async () => {
       fireEvent.click(screen.getByTestId('clear-btn'));
+      await new Promise(resolve => setTimeout(resolve, 50));
     });
 
     expect(screen.getByTestId('total-items')).toHaveTextContent('0');
@@ -125,8 +157,7 @@ describe('CartContext', () => {
     expect(screen.getByTestId('items-count')).toHaveTextContent('0');
   });
 
-  test('debe calcular totales correctamente con múltiples items', () => {
-    //componente de prueba con múltiples items
+  test('debe calcular totales correctamente con múltiples items', async () => {
     const MultiItemTestComponent = () => {
       const { totalItems, totalPrice, add } = useCart();
       
@@ -150,24 +181,24 @@ describe('CartContext', () => {
       );
     };
 
-    render(
-      <CartProvider>
-        <MultiItemTestComponent />
-      </CartProvider>
-    );
+    renderWithProviders(<MultiItemTestComponent />);
 
-    //agregar diferentes items
-    act(() => {
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
+    await act(async () => {
       fireEvent.click(screen.getByTestId('add-item1'));
+      await new Promise(resolve => setTimeout(resolve, 50));
       fireEvent.click(screen.getByTestId('add-item2'));
+      await new Promise(resolve => setTimeout(resolve, 50));
     });
 
     expect(screen.getByTestId('total-items')).toHaveTextContent('2');
-    expect(screen.getByTestId('total-price')).toHaveTextContent('125'); //50 + 75
+    expect(screen.getByTestId('total-price')).toHaveTextContent('125');
   });
 
-  test('debe manejar items con propiedades completas', () => {
-    //componente de prueba con item completo
+  test('debe manejar items con propiedades completas', async () => {
     const CompleteItemTestComponent = () => {
       const { items, add } = useCart();
       
@@ -192,14 +223,15 @@ describe('CartContext', () => {
       );
     };
 
-    render(
-      <CartProvider>
-        <CompleteItemTestComponent />
-      </CartProvider>
-    );
+    renderWithProviders(<CompleteItemTestComponent />);
 
-    act(() => {
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
+    await act(async () => {
       fireEvent.click(screen.getByTestId('add-complete-item'));
+      await new Promise(resolve => setTimeout(resolve, 50));
     });
 
     expect(screen.getByTestId('item-name')).toHaveTextContent('Test Vinyl');

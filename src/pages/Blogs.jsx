@@ -7,14 +7,18 @@ export default function Blogs() {
   const nav = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadBlogs = async () => {
       try {
         const blogsData = await blogsService.getAll(true); //solo blogs publicados
-        setBlogs(blogsData);
+        setBlogs(Array.isArray(blogsData) ? blogsData : []);
+        setError(null);
       } catch (error) {
         console.error('Error al cargar blogs:', error);
+        setError('Error al cargar los blogs. Por favor, intenta nuevamente.');
+        setBlogs([]);
       } finally {
         setLoading(false);
       }
@@ -44,29 +48,48 @@ export default function Blogs() {
       <section className="section-base">
         <h2 className="text-center">Últimas publicaciones</h2>
 
+        {error && (
+          <div className="container">
+            <div className="alert alert-error" style={{marginBottom: '2rem'}}>
+              {error}
+            </div>
+          </div>
+        )}
+
         <div className="container blogs-tiles">
-          {blogs.map((b) => (
-            <article key={b.id} className="card padded blog-card">
-              <div className="thumb">
-                <img src={b.imagen} alt={b.titulo} />
-              </div>
+          {blogs && blogs.length > 0 ? (
+            blogs.map((b) => {
+              const fecha = b.fecha_publicacion || b.fecha;
+              return (
+                <article key={b.id} className="card padded blog-card">
+                  {b.imagen && (
+                    <div className="thumb">
+                      <img src={b.imagen} alt={b.titulo || 'Blog'} />
+                    </div>
+                  )}
 
-              <div>
-                <h2 style={{marginTop:0}}>{b.titulo}</h2>
-                <div className="meta">
-                  {b.fecha_publicacion ? new Date(b.fecha_publicacion).toLocaleDateString() : new Date(b.fecha).toLocaleDateString()} · {b.autor?.nombre || b.autor} {b.categoria && `· ${b.categoria}`}
-                </div>
-                <p>{b.excerpt || b.descripcion}</p>
+                  <div>
+                    <h2 style={{marginTop:0}}>{b.titulo}</h2>
+                    <div className="meta">
+                      {fecha ? new Date(fecha).toLocaleDateString() : 'Sin fecha'} · {b.autor?.nombre || b.autor || 'Sin autor'} {b.categoria && `· ${b.categoria}`}
+                    </div>
+                    <p>{b.excerpt || b.descripcion || "No hay descripción disponible."}</p>
 
-                <button
-                  className="btn-base btn-orange"
-                  onClick={() => nav(`/blog/${b.id}`)}
-                >
-                  Leer más
-                </button>
-              </div>
-            </article>
-          ))}
+                    <button
+                      className="btn-base btn-orange"
+                      onClick={() => nav(`/blog/${b.id}`)}
+                    >
+                      Leer más
+                    </button>
+                  </div>
+                </article>
+              );
+            })
+          ) : (
+            <div className="text-center">
+              <p>No hay blogs disponibles en este momento.</p>
+            </div>
+          )}
         </div>
       </section>
     </>

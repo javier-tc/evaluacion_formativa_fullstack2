@@ -141,8 +141,7 @@ export default function DetalleProducto() {
 
               <h3 style={{marginTop:"1.25rem"}}>Descripción</h3>
               <p>
-                {product.descripcion ||
-                  "El segundo y último álbum de estudio de Amy Winehouse, ganador de múltiples premios Grammy."}
+                {(product.descripcion && product.descripcion.trim()) || (product.description && product.description.trim()) || "No hay descripción disponible para este producto."}
               </p>
 
               <h3 style={{marginTop:"1rem"}}>Especificaciones</h3>

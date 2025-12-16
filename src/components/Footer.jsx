@@ -13,7 +13,7 @@ export default function Footer() {
           </ul>
         </div>
         <div className="footer-copy">
-          <p>© 2024 VinylStore. Todos los derechos reservados.</p>
+          <p>© 2025 VinylStore. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

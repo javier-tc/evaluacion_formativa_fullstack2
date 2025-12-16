@@ -26,7 +26,7 @@ describe('Footer Component', () => {
 
   test('debe mostrar copyright correcto', () => {
     renderWithRouter(<Footer />);
-    expect(screen.getByText('© 2024 VinylStore. Todos los derechos reservados.')).toBeInTheDocument();
+    expect(screen.getByText('© 2025 VinylStore. Todos los derechos reservados.')).toBeInTheDocument();
   });
 
   test('debe tener estructura responsiva con Bootstrap', () => {

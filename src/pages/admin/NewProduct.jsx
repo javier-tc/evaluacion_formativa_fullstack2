@@ -149,12 +149,12 @@ const NewProduct = () => {
       try {
         const productoData = {
           nombre: formData.productName,
-          artista: formData.artist,
+          artista: formData.artista || null,
           precio: parseFloat(formData.price),
           categoria_id: parseInt(formData.category, 10),
           stock: parseInt(formData.stock, 10),
-          descripcion: formData.description || '',
-          imagen: formData.imageUrl || '',
+          descripcion: formData.description || null,
+          imagen: formData.imageUrl || null,
           activo: true
         };
         
