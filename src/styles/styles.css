@@ -156,7 +156,7 @@ body {
 
 .admin-shell .admin-body {
     height: 100vh;
-    overflow: hidden;
+    overflow: visible;
 }
 
 :root {
@@ -716,7 +716,7 @@ body {
 
 .admin-container {
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
 }
 
 /*sidebar del admin*/
@@ -826,6 +826,8 @@ body {
     margin-left: 280px;
     display: flex;
     flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .admin-header {
