@@ -7,8 +7,8 @@ import { useToast } from '../../contexts/ToastContext.jsx';
 const NewProduct = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    codigoProducto: '',
     productName: '',
+    artist: '',
     description: '',
     price: '',
     stock: '',
@@ -70,13 +70,13 @@ const NewProduct = () => {
   const validateField = (name, value) => {
     let error = '';
     switch (name) {
-      case 'codigoProducto':
-        if (!value.trim()) error = 'El código producto es obligatorio';
-        else if (value.length < 3) error = 'El código producto debe tener al menos 3 caracteres';
-        break;
       case 'productName':
         if (!value.trim()) error = 'El nombre es obligatorio';
         else if (value.length > 100) error = 'El nombre no puede exceder 100 caracteres';
+        break;
+      case 'artist':
+        if (!value.trim()) error = 'El artista es obligatorio';
+        else if (value.length > 100) error = 'El artista no puede exceder 100 caracteres';
         break;
       case 'description':
         if (value.length > 500) error = 'La descripción no puede exceder 500 caracteres';
@@ -150,7 +150,7 @@ const NewProduct = () => {
       try {
         const productoData = {
           nombre: formData.productName,
-          artista: formData.artista || '',
+          artista: formData.artist,
           precio: parseFloat(formData.price),
           categoria_id: parseInt(formData.category, 10),
           stock: parseInt(formData.stock, 10),
@@ -162,8 +162,8 @@ const NewProduct = () => {
         await productosService.create(productoData);
         toast.success(`¡Producto "${formData.productName}" creado exitosamente!`);
         setFormData({
-          codigoProducto: '',
           productName: '',
+          artist: '',
           description: '',
           price: '',
           stock: '',
@@ -205,20 +205,6 @@ const NewProduct = () => {
         )}
         <form className="admin-form" onSubmit={handleSubmit} noValidate>
           <div className="form-grid">
-            <div className={`form-group ${errors.codigoProducto ? 'error' : ''}`}>
-              <label htmlFor="codigoProducto">Código Producto *</label>
-              <input
-                type="text"
-                id="codigoProducto"
-                name="codigoProducto"
-                value={formData.codigoProducto}
-                onChange={handleChange}
-                required
-                minLength="3"
-              />
-              <span className="error-message">{errors.codigoProducto}</span>
-            </div>
-
             <div className={`form-group ${errors.productName ? 'error' : ''}`}>
               <label htmlFor="productName">Nombre *</label>
               <input
@@ -231,6 +217,20 @@ const NewProduct = () => {
                 maxLength="100"
               />
               <span className="error-message">{errors.productName}</span>
+            </div>
+
+            <div className={`form-group ${errors.artist ? 'error' : ''}`}>
+              <label htmlFor="artist">Artista *</label>
+              <input
+                type="text"
+                id="artist"
+                name="artist"
+                value={formData.artist}
+                onChange={handleChange}
+                required
+                maxLength="100"
+              />
+              <span className="error-message">{errors.artist}</span>
             </div>
 
             <div className={`form-group ${errors.description ? 'error' : ''}`}>

@@ -1,18 +1,88 @@
-import React, { useState, useMemo } from 'react';
-import { Container, Row, Col, Card, Button, Badge, Form } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { PRODUCTS } from '../data/products.js';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Container, Row, Col, Card, Button, Badge, Form, Spinner, Alert } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import { productosService, categoriasService } from '../services/api.js';
+import { useCart } from '../contexts/CartContext.jsx';
+import { useToast } from '../contexts/ToastContext.jsx';
 
 const Ofertas = () => {
   const [filtroPrecio, setFiltroPrecio] = useState('');
   const [filtroCategoria, setFiltroCategoria] = useState('');
   const [ordenarPor, setOrdenarPor] = useState('descuento');
+  const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { add } = useCart();
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [productosData, categoriasData] = await Promise.all([
+          productosService.getAll(true), //solo productos activos
+          categoriasService.getAll()
+        ]);
+        setProductos(productosData);
+        setCategorias(categoriasData);
+      } catch (error) {
+        console.error('Error al cargar productos:', error);
+        toast.error('Error al cargar productos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [toast]);
+
+  const getCategoriaNombre = (producto) => {
+    if (!producto || !Array.isArray(categorias) || categorias.length === 0) {
+      return producto?.categoria?.nombre || (producto?.categoria && typeof producto.categoria === 'string' ? producto.categoria : '') || '';
+    }
+    
+    if (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.nombre) {
+      return producto.categoria.nombre;
+    }
+    
+    const categoriaId = producto.categoria_id || (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.id) || null;
+    
+    if (categoriaId) {
+      const categoriaIdNum = Number(categoriaId);
+      const encontrada = categorias.find((c) => Number(c.id) === categoriaIdNum);
+      if (encontrada && encontrada.nombre) {
+        return encontrada.nombre;
+      }
+    }
+    
+    const categoriaNombre = producto.categoria && typeof producto.categoria === 'string' 
+      ? producto.categoria 
+      : '';
+    
+    if (categoriaNombre) {
+      const encontradaPorNombre = categorias.find((c) => 
+        c.nombre && c.nombre.toLowerCase() === categoriaNombre.toLowerCase()
+      );
+      
+      if (encontradaPorNombre && encontradaPorNombre.nombre) {
+        return encontradaPorNombre.nombre;
+      }
+      
+      return categoriaNombre;
+    }
+    
+    return '';
+  };
 
   //simular productos en oferta (descuentos del 10% al 50%)
   const productosConOfertas = useMemo(() => {
-    return PRODUCTS.map(producto => {
+    if (!Array.isArray(productos) || productos.length === 0) {
+      return [];
+    }
+    
+    return productos.map(producto => {
       const descuento = Math.floor(Math.random() * 41) + 10; //10% a 50%
-      const precioOriginal = producto.precio;
+      const precioOriginal = Number(producto.precio) || 0;
       const precioDescuento = Math.round(precioOriginal * (1 - descuento / 100));
       
       return {
@@ -23,10 +93,14 @@ const Ofertas = () => {
         enOferta: true
       };
     });
-  }, []);
+  }, [productos]);
 
   //filtrar productos según los filtros aplicados
   const productosFiltrados = useMemo(() => {
+    if (!Array.isArray(productosConOfertas) || productosConOfertas.length === 0) {
+      return [];
+    }
+
     let productos = productosConOfertas;
 
     //filtrar por precio
@@ -37,7 +111,10 @@ const Ofertas = () => {
 
     //filtrar por categoría
     if (filtroCategoria) {
-      productos = productos.filter(p => p.categoria === filtroCategoria);
+      productos = productos.filter(p => {
+        const catNombre = getCategoriaNombre(p);
+        return catNombre && catNombre.toLowerCase() === filtroCategoria.toLowerCase();
+      });
     }
 
     //ordenar productos
@@ -54,12 +131,15 @@ const Ofertas = () => {
     });
 
     return productos;
-  }, [productosConOfertas, filtroPrecio, filtroCategoria, ordenarPor]);
+  }, [productosConOfertas, filtroPrecio, filtroCategoria, ordenarPor, categorias]);
 
-  //obtener categorías únicas
-  const categorias = useMemo(() => {
-    return [...new Set(PRODUCTS.map(p => p.categoria))];
-  }, []);
+  //obtener categorías únicas de los productos
+  const categoriasUnicas = useMemo(() => {
+    if (!Array.isArray(categorias) || categorias.length === 0) {
+      return [];
+    }
+    return categorias.map(cat => cat.nombre);
+  }, [categorias]);
 
   const formatearPrecio = (precio) => {
     return new Intl.NumberFormat('es-CL', {
@@ -71,6 +151,34 @@ const Ofertas = () => {
   const calcularAhorro = (precioOriginal, precioDescuento) => {
     return precioOriginal - precioDescuento;
   };
+
+  const handleAddToCart = async (producto) => {
+    try {
+      await add({
+        id: producto.id,
+        nombre: producto.nombre,
+        precio: producto.precioDescuento, //agregar al carrito con precio de oferta
+        imagen: producto.imagen,
+        artista: producto.artista,
+        qty: 1
+      });
+      toast.success(`Se agregó "${producto.nombre}" al carrito`);
+    } catch (error) {
+      toast.error('Error al agregar producto al carrito');
+    }
+  };
+
+  if (loading) {
+    return (
+      <Container className="py-5">
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Cargando ofertas...</span>
+          </Spinner>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-5">
@@ -118,7 +226,7 @@ const Ofertas = () => {
                   onChange={(e) => setFiltroCategoria(e.target.value)}
                 >
                   <option value="">Todas las categorías</option>
-                  {categorias.map(cat => (
+                  {categoriasUnicas.map(cat => (
                     <option key={cat} value={cat}>
                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
                     </option>
@@ -177,17 +285,19 @@ const Ofertas = () => {
                       >
                         -{producto.descuento}%
                       </Badge>
-                      <Badge 
-                        bg="success" 
-                        className="position-absolute top-0 end-0 m-2"
-                      >
-                        {producto.categoria}
-                      </Badge>
+                      {getCategoriaNombre(producto) && (
+                        <Badge 
+                          bg="success" 
+                          className="position-absolute top-0 end-0 m-2"
+                        >
+                          {getCategoriaNombre(producto)}
+                        </Badge>
+                      )}
                     </div>
                     <Card.Body className="d-flex flex-column">
                       <Card.Title className="h6">{producto.nombre}</Card.Title>
                       <Card.Text className="text-muted small">
-                        {producto.artista} • {producto.año}
+                        {producto.artista} {producto.año && `• ${producto.año}`}
                       </Card.Text>
                       
                       <div className="mb-3">
@@ -205,16 +315,24 @@ const Ofertas = () => {
                       </div>
 
                       <div className="mt-auto">
-                        <Button 
-                          as={Link} 
-                          to={`/producto/${producto.id}`}
-                          variant="danger" 
-                          size="sm" 
-                          className="w-100"
-                        >
-                          <i className="bi bi-cart-plus me-2"></i>
-                          Ver Oferta
-                        </Button>
+                        <div className="d-grid gap-2">
+                          <Button 
+                            variant="danger" 
+                            size="sm"
+                            onClick={() => handleAddToCart(producto)}
+                          >
+                            <i className="bi bi-cart-plus me-2"></i>
+                            Agregar al Carrito
+                          </Button>
+                          <Button 
+                            as={Link} 
+                            to={`/producto/${producto.id}`}
+                            variant="outline-danger" 
+                            size="sm"
+                          >
+                            Ver Detalles
+                          </Button>
+                        </div>
                       </div>
                     </Card.Body>
                   </Card>

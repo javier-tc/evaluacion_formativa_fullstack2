@@ -1,63 +1,232 @@
-import React, { useState, useMemo } from 'react';
-import { Container, Row, Col, Card, Button, Badge, Form } from 'react-bootstrap';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Container, Row, Col, Card, Button, Badge, Form, Spinner, Alert } from 'react-bootstrap';
 import { useParams, Link } from 'react-router-dom';
-import { PRODUCTS } from '../data/products.js';
+import { productosService, categoriasService } from '../services/api.js';
+import { useToast } from '../contexts/ToastContext.jsx';
 
 const Categorias = () => {
   const { categoria } = useParams();
   const [filtroPrecio, setFiltroPrecio] = useState('');
   const [filtroAño, setFiltroAño] = useState('');
   const [ordenarPor, setOrdenarPor] = useState('nombre');
+  const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
-  //obtener todas las categorías únicas
-  const categorias = useMemo(() => {
-    const cats = [...new Set(PRODUCTS.map(p => p.categoria))];
-    return cats.map(cat => ({
-      nombre: cat,
-      cantidad: PRODUCTS.filter(p => p.categoria === cat).length
-    }));
-  }, []);
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [productosData, categoriasData] = await Promise.all([
+          productosService.getAll(true), //solo productos activos
+          categoriasService.getAll()
+        ]);
+        setProductos(productosData);
+        setCategorias(categoriasData);
+      } catch (error) {
+        console.error('Error al cargar datos:', error);
+        toast.error('Error al cargar productos y categorías');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [toast]);
+
+  //obtener categorías con cantidad de productos
+  const categoriasConCantidad = useMemo(() => {
+    if (!Array.isArray(categorias) || !Array.isArray(productos)) {
+      return [];
+    }
+
+    const getCategoriaNombre = (producto) => {
+      if (!producto || !Array.isArray(categorias) || categorias.length === 0) {
+        return producto?.categoria?.nombre || (producto?.categoria && typeof producto.categoria === 'string' ? producto.categoria : '') || '';
+      }
+      
+      const categoriaId = producto.categoria_id || (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.id) || null;
+      
+      if (categoriaId) {
+        const categoriaIdNum = Number(categoriaId);
+        const encontrada = categorias.find((c) => Number(c.id) === categoriaIdNum);
+        if (encontrada && encontrada.nombre) {
+          return encontrada.nombre;
+        }
+      }
+      
+      const categoriaNombre = producto.categoria && typeof producto.categoria === 'string' 
+        ? producto.categoria 
+        : (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.nombre) 
+          ? producto.categoria.nombre 
+          : '';
+      
+      if (categoriaNombre) {
+        const encontradaPorNombre = categorias.find((c) => 
+          c.nombre && c.nombre.toLowerCase() === categoriaNombre.toLowerCase()
+        );
+        
+        if (encontradaPorNombre && encontradaPorNombre.nombre) {
+          return encontradaPorNombre.nombre;
+        }
+        
+        return categoriaNombre;
+      }
+      
+      return '';
+    };
+
+    return categorias.map(cat => {
+      const cantidad = productos.filter(p => {
+        const catNombre = getCategoriaNombre(p);
+        return catNombre && catNombre.toLowerCase() === cat.nombre.toLowerCase();
+      }).length;
+      
+      return {
+        id: cat.id,
+        nombre: cat.nombre,
+        cantidad: cantidad
+      };
+    });
+  }, [categorias, productos]);
 
   //filtrar productos según la categoría seleccionada
   const productosFiltrados = useMemo(() => {
-    let productos = categoria 
-      ? PRODUCTS.filter(p => p.categoria === categoria)
-      : PRODUCTS;
+    if (!Array.isArray(productos) || productos.length === 0) {
+      return [];
+    }
+
+    const getCategoriaNombre = (producto) => {
+      if (!producto || !Array.isArray(categorias) || categorias.length === 0) {
+        return producto?.categoria?.nombre || (producto?.categoria && typeof producto.categoria === 'string' ? producto.categoria : '') || '';
+      }
+      
+      const categoriaId = producto.categoria_id || (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.id) || null;
+      
+      if (categoriaId) {
+        const categoriaIdNum = Number(categoriaId);
+        const encontrada = categorias.find((c) => Number(c.id) === categoriaIdNum);
+        if (encontrada && encontrada.nombre) {
+          return encontrada.nombre;
+        }
+      }
+      
+      const categoriaNombre = producto.categoria && typeof producto.categoria === 'string' 
+        ? producto.categoria 
+        : (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.nombre) 
+          ? producto.categoria.nombre 
+          : '';
+      
+      if (categoriaNombre) {
+        const encontradaPorNombre = categorias.find((c) => 
+          c.nombre && c.nombre.toLowerCase() === categoriaNombre.toLowerCase()
+        );
+        
+        if (encontradaPorNombre && encontradaPorNombre.nombre) {
+          return encontradaPorNombre.nombre;
+        }
+        
+        return categoriaNombre;
+      }
+      
+      return '';
+    };
+
+    let productosFiltrados = categoria 
+      ? productos.filter(p => {
+          const catNombre = getCategoriaNombre(p);
+          return catNombre && catNombre.toLowerCase() === categoria.toLowerCase();
+        })
+      : productos;
 
     //aplicar filtros adicionales
     if (filtroPrecio) {
       const [min, max] = filtroPrecio.split('-').map(Number);
-      productos = productos.filter(p => p.precio >= min && p.precio <= max);
+      productosFiltrados = productosFiltrados.filter(p => {
+        const precio = Number(p.precio) || 0;
+        return precio >= min && precio <= max;
+      });
     }
 
     if (filtroAño) {
-      productos = productos.filter(p => p.año >= parseInt(filtroAño));
+      productosFiltrados = productosFiltrados.filter(p => {
+        const año = p.año || 0;
+        return año >= parseInt(filtroAño);
+      });
     }
 
     //ordenar productos
-    productos.sort((a, b) => {
+    productosFiltrados.sort((a, b) => {
       switch (ordenarPor) {
         case 'precio-asc':
-          return a.precio - b.precio;
+          return (Number(a.precio) || 0) - (Number(b.precio) || 0);
         case 'precio-desc':
-          return b.precio - a.precio;
+          return (Number(b.precio) || 0) - (Number(a.precio) || 0);
         case 'año':
-          return b.año - a.año;
+          return (b.año || 0) - (a.año || 0);
         case 'nombre':
         default:
-          return a.nombre.localeCompare(b.nombre);
+          return (a.nombre || '').localeCompare(b.nombre || '');
       }
     });
 
-    return productos;
-  }, [categoria, filtroPrecio, filtroAño, ordenarPor]);
+    return productosFiltrados;
+  }, [categoria, filtroPrecio, filtroAño, ordenarPor, productos, categorias]);
 
   const formatearPrecio = (precio) => {
     return new Intl.NumberFormat('es-CL', {
       style: 'currency',
       currency: 'CLP'
-    }).format(precio);
+    }).format(Number(precio) || 0);
   };
+
+  const getCategoriaNombre = (producto) => {
+    if (!producto || !Array.isArray(categorias) || categorias.length === 0) {
+      return producto?.categoria?.nombre || (producto?.categoria && typeof producto.categoria === 'string' ? producto.categoria : '') || '';
+    }
+    
+    const categoriaId = producto.categoria_id || (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.id) || null;
+    
+    if (categoriaId) {
+      const categoriaIdNum = Number(categoriaId);
+      const encontrada = categorias.find((c) => Number(c.id) === categoriaIdNum);
+      if (encontrada && encontrada.nombre) {
+        return encontrada.nombre;
+      }
+    }
+    
+    const categoriaNombre = producto.categoria && typeof producto.categoria === 'string' 
+      ? producto.categoria 
+      : (producto.categoria && typeof producto.categoria === 'object' && producto.categoria.nombre) 
+        ? producto.categoria.nombre 
+        : '';
+    
+    if (categoriaNombre) {
+      const encontradaPorNombre = categorias.find((c) => 
+        c.nombre && c.nombre.toLowerCase() === categoriaNombre.toLowerCase()
+      );
+      
+      if (encontradaPorNombre && encontradaPorNombre.nombre) {
+        return encontradaPorNombre.nombre;
+      }
+      
+      return categoriaNombre;
+    }
+    
+    return '';
+  };
+
+  if (loading) {
+    return (
+      <Container className="py-5">
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Cargando productos...</span>
+          </Spinner>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-5">
@@ -75,11 +244,11 @@ const Categorias = () => {
                 >
                   Todas las categorías
                 </Link>
-                {categorias.map(cat => (
+                {categoriasConCantidad.map(cat => (
                   <Link
-                    key={cat.nombre}
-                    to={`/categorias/${cat.nombre}`}
-                    className={`btn ${categoria === cat.nombre ? 'btn-primary' : 'btn-outline-primary'}`}
+                    key={cat.id || cat.nombre}
+                    to={`/categorias/${cat.nombre.toLowerCase()}`}
+                    className={`btn ${categoria && categoria.toLowerCase() === cat.nombre.toLowerCase() ? 'btn-primary' : 'btn-outline-primary'}`}
                   >
                     {cat.nombre.charAt(0).toUpperCase() + cat.nombre.slice(1)}
                     <Badge bg="secondary" className="ms-2">{cat.cantidad}</Badge>
@@ -167,17 +336,19 @@ const Categorias = () => {
                         alt={producto.nombre}
                         style={{ height: '200px', objectFit: 'cover' }}
                       />
-                      <Badge 
-                        bg="success" 
-                        className="position-absolute top-0 end-0 m-2"
-                      >
-                        {producto.categoria}
-                      </Badge>
+                      {getCategoriaNombre(producto) && (
+                        <Badge 
+                          bg="success" 
+                          className="position-absolute top-0 end-0 m-2"
+                        >
+                          {getCategoriaNombre(producto)}
+                        </Badge>
+                      )}
                     </div>
                     <Card.Body className="d-flex flex-column">
                       <Card.Title className="h6">{producto.nombre}</Card.Title>
                       <Card.Text className="text-muted small">
-                        {producto.artista} • {producto.año}
+                        {producto.artista} {producto.año && `• ${producto.año}`}
                       </Card.Text>
                       <Card.Text className="fw-bold text-primary mb-3">
                         {formatearPrecio(producto.precio)}

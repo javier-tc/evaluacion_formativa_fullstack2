@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext.jsx';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useToast } from '../contexts/ToastContext.jsx';
+import { usuariosService } from '../services/api.js';
 import { REGIONES_COMUNAS } from '../data/users.js';
 
 const Checkout = () => {
@@ -31,6 +32,56 @@ const Checkout = () => {
 
     const [errores, setErrores] = useState({});
     const [procesando, setProcesando] = useState(false);
+    const [cargandoUsuario, setCargandoUsuario] = useState(false);
+
+    //cargar datos completos del usuario desde el backend
+    useEffect(() => {
+        const loadUserData = async () => {
+            if (user?.id) {
+                setCargandoUsuario(true);
+                try {
+                    const userData = await usuariosService.getById(user.id);
+                    
+                    //extraer datos de dirección - puede venir como objeto o string
+                    let direccion = {};
+                    if (userData.direccion) {
+                        if (typeof userData.direccion === 'string') {
+                            //si es string, intentar parsear si es JSON
+                            try {
+                                direccion = JSON.parse(userData.direccion);
+                            } catch {
+                                //si no es JSON, puede ser una dirección completa como string
+                                direccion = { calle: userData.direccion };
+                            }
+                        } else if (typeof userData.direccion === 'object') {
+                            direccion = userData.direccion;
+                        }
+                    }
+                    
+                    //actualizar formData con los datos del usuario
+                    setFormData(prev => ({
+                        ...prev,
+                        nombre: userData.nombre || prev.nombre,
+                        apellidos: userData.apellidos || prev.apellidos,
+                        email: userData.email || prev.email,
+                        telefono: userData.telefono || prev.telefono,
+                        calle: direccion.calle || direccion.direccion || prev.calle,
+                        departamento: direccion.departamento || prev.departamento,
+                        region: direccion.region || userData.region || prev.region,
+                        comuna: direccion.comuna || userData.comuna || prev.comuna,
+                        indicaciones: direccion.indicaciones || direccion.instrucciones || prev.indicaciones
+                    }));
+                } catch (error) {
+                    console.error('Error al cargar datos del usuario:', error);
+                    //no mostrar error al usuario, solo usar los datos que ya tiene
+                } finally {
+                    setCargandoUsuario(false);
+                }
+            }
+        };
+
+        loadUserData();
+    }, [user?.id]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -211,7 +262,14 @@ const Checkout = () => {
                 <Col lg={8}>
                     <Card>
                         <Card.Header>
-                            <h4 className="mb-0">Información de Envío</h4>
+                            <h4 className="mb-0">
+                                Información de Envío
+                                {cargandoUsuario && (
+                                    <small className="text-muted ms-2">
+                                        <i className="bi bi-arrow-clockwise spinner-border spinner-border-sm"></i> Cargando datos guardados...
+                                    </small>
+                                )}
+                            </h4>
                         </Card.Header>
                         <Card.Body>
                             <Form onSubmit={handleSubmit}>

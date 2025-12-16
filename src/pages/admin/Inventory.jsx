@@ -218,13 +218,13 @@ const Inventory = () => {
               <i className="fas fa-warehouse"></i>
               Inventario Completo
             </button>
-            <button 
+            {/* <button 
               className={`tab ${activeTab === 'criticos' ? 'active' : ''}`}
               onClick={() => setActiveTab('criticos')}
             >
               <i className="fas fa-exclamation-triangle"></i>
               Productos Críticos ({criticalProducts.length})
-            </button>
+            </button> */}
           </div>
         </div>
 
