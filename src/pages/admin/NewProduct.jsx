@@ -8,7 +8,7 @@ const NewProduct = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     productName: '',
-    artist: '',
+    artista: '',
     description: '',
     price: '',
     stock: '',
@@ -74,9 +74,8 @@ const NewProduct = () => {
         if (!value.trim()) error = 'El nombre es obligatorio';
         else if (value.length > 100) error = 'El nombre no puede exceder 100 caracteres';
         break;
-      case 'artist':
-        if (!value.trim()) error = 'El artista es obligatorio';
-        else if (value.length > 100) error = 'El artista no puede exceder 100 caracteres';
+      case 'artista':
+        if (value.length > 100) error = 'El artista no puede exceder 100 caracteres';
         break;
       case 'description':
         if (value.length > 500) error = 'La descripción no puede exceder 500 caracteres';
@@ -163,7 +162,7 @@ const NewProduct = () => {
         toast.success(`¡Producto "${formData.productName}" creado exitosamente!`);
         setFormData({
           productName: '',
-          artist: '',
+          artista: '',
           description: '',
           price: '',
           stock: '',
@@ -219,18 +218,18 @@ const NewProduct = () => {
               <span className="error-message">{errors.productName}</span>
             </div>
 
-            <div className={`form-group ${errors.artist ? 'error' : ''}`}>
-              <label htmlFor="artist">Artista *</label>
+            <div className={`form-group ${errors.artista ? 'error' : ''}`}>
+              <label htmlFor="artista">Artista</label>
               <input
                 type="text"
-                id="artist"
-                name="artist"
-                value={formData.artist}
+                id="artista"
+                name="artista"
+                value={formData.artista}
                 onChange={handleChange}
-                required
                 maxLength="100"
+                placeholder="Nombre del artista (opcional)"
               />
-              <span className="error-message">{errors.artist}</span>
+              <span className="error-message">{errors.artista}</span>
             </div>
 
             <div className={`form-group ${errors.description ? 'error' : ''}`}>
